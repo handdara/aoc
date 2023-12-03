@@ -7,7 +7,7 @@ dayParser :: Parser Int
 dayParser = argInt "day" "which day to solve"
 
 inputParser :: Parser FilePath
-inputParser = optPath "input" 'i' "input file if needed"
+inputParser = optPath "input" 'i' "input file to use, default: \"input<DAY>.txt\""
 
 outputParser :: Parser FilePath
 outputParser = optPath "output" 'o' "output file if needed"
