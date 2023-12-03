@@ -177,10 +177,6 @@ solveDay2 input'path = do
   input'string <- hGetContents input'handle
 
   let input'lines = lines input'string
-  -- let games'maybe = mapM parseGame input'lines
-  -- let games'valid = filterValidGames elfsBag <$> games'maybe
-  -- let games'valid'ids = map getID <$> games'valid
-  -- let games'powers = map (power . fdMinCubeSet) <$> games'maybe
 
   -- putStrLn $ "Valid games: " ++ show games'valid'ids
   putStrLn $ "Solution to part 1: " ++ show (solutionPart1 input'lines)
