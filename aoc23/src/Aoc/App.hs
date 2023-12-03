@@ -8,8 +8,8 @@ module Aoc.App
   )
 where
 
-import Turtle
-import Prelude hiding (log)
+import Turtle 
+import Prelude hiding (log, FilePath)
 
 -- * App Types
 
@@ -17,7 +17,9 @@ import Prelude hiding (log)
 data Command
   = Solve
     { -- | the answer word given by the user
-      day :: Int
+      day :: Int,
+      input :: Maybe FilePath,
+      output :: Maybe FilePath
     }
   deriving (Show)
 

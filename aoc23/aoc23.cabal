@@ -1,4 +1,4 @@
-cabal-version:      3.4
+cabal-version:      3.8
 name:               aoc23
 version:            0.1.0.0
 -- synopsis:
@@ -29,7 +29,10 @@ library
     import:           warnings
     import:           shared-props
     exposed-modules:  Aoc
-    other-modules: Aoc.App, Aoc.Solve
+    other-modules:
+        Aoc.App, 
+        Aoc.Solve.One,
+        Aoc.Solve.Two,
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src
