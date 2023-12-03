@@ -6,8 +6,8 @@ where
 
 import Aoc.App
 import Aoc.Solve.One
-import Aoc.Solve.Two
 import Aoc.Solve.Three
+import Aoc.Solve.Two
 import Turtle
 import Prelude hiding (FilePath, log)
 
