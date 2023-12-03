@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               aoc22
-version:            0.1.0.0
+version:            0.1.0.1
 -- synopsis:
 -- description:
 license:            GPL-3.0-or-later
@@ -37,7 +37,7 @@ library
     hs-source-dirs:   src
     default-language: Haskell2010
 
-executable aoc23
+executable aoc22
     import:           warnings
     import:           shared-props
     main-is:          Main.hs
