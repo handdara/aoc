@@ -7,6 +7,8 @@ import Control.Applicative
 import Data.Char (isDigit, isSpace)
 import System.IO
 
+-- * Data Types
+
 data Cube = Red Int | Green Int | Blue Int deriving (Show)
 
 data CubeSet = CubeSet
@@ -24,6 +26,8 @@ data Game = Game
 newtype Parser a = Parser
   { runParser :: String -> Maybe (String, a)
   }
+
+-- * Parser type Alternative implementation
 
 instance Functor Parser where
   fmap f (Parser p) = Parser p'new
@@ -47,6 +51,8 @@ instance Alternative Parser where
 
   (Parser p'l) <|> (Parser p'r) =
     Parser $ \s -> p'l s <|> p'r s
+
+-- * Parsers
 
 mkCharParser :: Char -> Parser Char
 mkCharParser c = Parser f
@@ -125,8 +131,12 @@ cubeSetListParser = mkSepByParser sepParser cubeSetParser
 gameParser :: Parser Game
 gameParser = Game <$> gameIDParser <*> cubeSetListParser
 
+-- * Actual solution
+
 parseGame :: String -> Maybe Game
 parseGame s = snd <$> runParser gameParser s
+
+-- ** Part 1 
 
 isValidGame :: CubeSet -> Game -> Bool
 isValidGame bag game = foldl f True (getSets game)
@@ -145,6 +155,8 @@ solutionPart1 ls = sum . map getID . filterValidGames elfsBag <$> mapM parseGame
   where
     elfsBag = CubeSet 12 13 14
 
+-- ** Part 2
+
 fdMinCubeSet :: Game -> CubeSet
 fdMinCubeSet game = foldl f (CubeSet 0 0 0) sets
   where
@@ -156,6 +168,8 @@ power (CubeSet r g b) = r * g * b
 
 solutionPart2 :: [String] -> Maybe Int
 solutionPart2 ls = sum . map (power . fdMinCubeSet) <$> mapM parseGame ls
+
+-- * Top level input/output func
 
 solveDay2 :: FilePath -> IO ()
 solveDay2 input'path = do
