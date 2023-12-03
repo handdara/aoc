@@ -42,7 +42,7 @@ mkNum row colTerm s = Number row (colTerm - length s) (colTerm - 1) (read s)
 mkSym row colTerm = Symbol row (colTerm - 1)
 
 convertRow :: State -> Int -> Int -> String -> State
-convertRow state _ _ _ = state
+convertRow state _ _ [] = state
 convertRow state row col (c : cs)
   | isDigit c = case currNumBuild state of
       Nothing -> convertRow (State (Just [c]) (currNums state) (currSyms state)) row (col + 1) cs
@@ -52,7 +52,7 @@ convertRow state row col (c : cs)
       Just ds -> convertRow (State Nothing (mkNum row col ds : currNums state) (currSyms state)) row (col + 1) cs 
   | otherwise = case currNumBuild state of 
     Nothing -> convertRow (State Nothing (currNums state) (mkSym row col : currSyms state)) row (col + 1) cs
-    Just ds -> undefined
+    Just ds -> convertRow (State Nothing (mkNum row col ds : currNums state) (mkSym row col : currSyms state)) row (col + 1) cs  
 
 solutionPart1 _ = "In Progress"
 
