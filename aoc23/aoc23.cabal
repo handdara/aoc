@@ -33,6 +33,7 @@ library
         Aoc.App, 
         Aoc.Solve.One,
         Aoc.Solve.Two,
+        Aoc.Solve.Three,
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src
