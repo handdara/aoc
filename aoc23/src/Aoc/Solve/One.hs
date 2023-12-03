@@ -3,8 +3,6 @@ module Aoc.Solve.One
   )
 where
 
-import qualified Data.List as L
-import Debug.Trace (trace)
 import System.IO
 
 getFirstAndLast :: String -> (Maybe Char, Maybe Char)
@@ -49,7 +47,7 @@ leadingDigit = leadingDigit' digits
         "9",
         "nine"
       ]
-    leadingDigit' [] s = Nothing
+    leadingDigit' [] _ = Nothing
     leadingDigit' (d : ds) s =
       if frontIsDigit s d
         then Just (quot (19 - length ds) 2)

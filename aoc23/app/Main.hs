@@ -35,7 +35,6 @@ aoc :: (MonadIO io) => A.Command -> A.Opts -> io ()
 aoc command _ = do
   case command of
     A.Solve day in'm out'm -> A.solveFunc day in'm out'm
-    _ -> die "not implemented yet"
 
 main :: IO ()
 main = do

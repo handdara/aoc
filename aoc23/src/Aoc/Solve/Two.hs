@@ -1,11 +1,10 @@
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
-module Aoc.Solve.Two where
+module Aoc.Solve.Two
+  ( solveDay2,
+  )
+where
 
 import Control.Applicative
 import Data.Char (isDigit, isSpace)
-import Debug.Trace (trace)
 import System.IO
 
 data Cube = Red Int | Green Int | Blue Int deriving (Show)
@@ -67,6 +66,7 @@ mkSpanParser p = Parser f
       let (is, isnt) = span p s
        in Just (isnt, is)
 
+ensureNonempty :: Parser [a] -> Parser [a]
 ensureNonempty (Parser p) = Parser f
   where
     f s = do
@@ -75,13 +75,16 @@ ensureNonempty (Parser p) = Parser f
         then Nothing
         else Just (s', xs)
 
+whiteParser :: Parser String
 whiteParser = mkSpanParser isSpace
 
 intParser :: Parser Int
 intParser = read <$> ensureNonempty (mkSpanParser isDigit)
 
-idParser = mkStringParser "Game" *> whiteParser *> intParser <* mkCharParser ':'
+gameIDParser :: Parser Int
+gameIDParser = mkStringParser "Game" *> whiteParser *> intParser <* mkCharParser ':'
 
+cubeParser :: Parser Cube
 cubeParser = redCubeParser <|> greenCubeParser <|> blueCubeParser
   where
     redCubeParser = Red <$> (whiteParser *> intParser <* whiteParser <* mkStringParser "red")
@@ -99,11 +102,10 @@ mkSepByParser s e =
   (:) <$> e <*> many (s *> e)
     <|> pure []
 
+cubeListParser :: Parser [Cube]
 cubeListParser = mkSepByParser sepParser cubeParser
   where
     sepParser = whiteParser *> mkCharParser ',' <* whiteParser
-
-tracer msg x = trace (msg <> show x) x
 
 cubeListToCubeSet :: [Cube] -> CubeSet
 cubeListToCubeSet = foldl f (CubeSet 0 0 0)
@@ -121,11 +123,10 @@ cubeSetListParser = mkSepByParser sepParser cubeSetParser
     sepParser = whiteParser *> mkCharParser ';' <* whiteParser
 
 gameParser :: Parser Game
-gameParser = Game <$> idParser <*> cubeSetListParser
+gameParser = Game <$> gameIDParser <*> cubeSetListParser
 
+parseGame :: String -> Maybe Game
 parseGame s = snd <$> runParser gameParser s
-
-elfsBag = CubeSet 12 13 14
 
 isValidGame :: CubeSet -> Game -> Bool
 isValidGame bag game = foldl f True (getSets game)
@@ -139,7 +140,10 @@ isValidGame bag game = foldl f True (getSets game)
 filterValidGames :: CubeSet -> [Game] -> [Game]
 filterValidGames bag gs = [g | g <- gs, isValidGame bag g]
 
+solutionPart1 :: [String] -> Maybe Int
 solutionPart1 ls = sum . map getID . filterValidGames elfsBag <$> mapM parseGame ls
+  where
+    elfsBag = CubeSet 12 13 14
 
 fdMinCubeSet :: Game -> CubeSet
 fdMinCubeSet game = foldl f (CubeSet 0 0 0) sets
@@ -150,8 +154,10 @@ fdMinCubeSet game = foldl f (CubeSet 0 0 0) sets
 power :: CubeSet -> Int
 power (CubeSet r g b) = r * g * b
 
-solutionPart2 ls = sum . map (power .fdMinCubeSet) <$> mapM parseGame ls
+solutionPart2 :: [String] -> Maybe Int
+solutionPart2 ls = sum . map (power . fdMinCubeSet) <$> mapM parseGame ls
 
+solveDay2 :: FilePath -> IO ()
 solveDay2 input'path = do
   input'handle <- openFile input'path ReadMode
   input'string <- hGetContents input'handle
