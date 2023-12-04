@@ -6,9 +6,9 @@ where
 import Control.Applicative
 import Control.Monad ((<=<))
 import Data.Char (isDigit, isSpace)
-import Data.HashMap.Strict ((!?))
+import Data.HashMap.Strict ((!?),(!))
 import qualified Data.HashMap.Strict as M
-import qualified Data.HashTable.IO as HT
+import qualified Data.List as L
 import qualified Data.Set as S
 import System.IO
 
@@ -32,14 +32,9 @@ data Card
       NumSet
   deriving (Show)
 
-getID :: Card -> CardID
-getID (Card cID _ _) = cID
-
 type CardMap = M.HashMap CardID (NumSet, NumSet)
 
-type HashTable k v = HT.BasicHashTable k v
-
-type CardCounts = HashTable CardID Int
+type CardCounts = M.HashMap CardID Int
 
 newtype Parser a = Parser
   { runParser :: String -> Maybe (String, a)
@@ -155,45 +150,36 @@ processCardID cardM cID = case cardM !? cID of
     let n = S.size $ getWinners t
      in [cID + 1 .. cID + n]
 
-insertAdd :: (Num a) => a -> Maybe a -> (Maybe a, ())
-insertAdd n Nothing = (Just n, ())
-insertAdd n (Just v) = (Just (v + n), ())
+processCardIDs :: [CardID] -> CardMap -> Buffer -> Buffer
+processCardIDs [] _ b = b
+processCardIDs (cID : rest) cardM (Buffer todoM doneM) =
+  processCardIDs rest cardM (Buffer todoM'new doneM'new)
+  where
+    multiples = todoM ! cID
+    newCards = processCardID cardM cID
+    doneM'new = M.insert cID multiples doneM
+    todoM'new = foldr (\k acc -> M.insertWith (+) k multiples acc) todoM newCards
 
-processCardIDs :: [CardID] -> CardMap -> Buffer -> IO Buffer
-processCardIDs [] _ b = return b
-processCardIDs (cID : rest) cardM (Buffer todoHT doneHT) = do
-  (Just multiples) <- HT.lookup todoHT cID
-  let newCards = processCardID cardM cID
-  HT.mutate doneHT cID (insertAdd multiples)
-  mapM_ (\k -> HT.mutate todoHT k (insertAdd multiples)) newCards
-  processCardIDs rest cardM (Buffer todoHT doneHT)
+tallyCounts :: CardCounts -> Int
+tallyCounts = sum . M.elems
 
-tallyCounts :: CardCounts -> IO Int
-tallyCounts = return . sum . map snd <=< HT.toList
+initializeBuffer :: [CardID] -> Buffer
+initializeBuffer cIDs = Buffer (foldr (\k acc -> M.insertWith (+) k 1 acc) M.empty cIDs) M.empty
 
-initializeBuffer :: [CardID] -> IO Buffer
-initializeBuffer ks = do
-  todoHT <- HT.new
-  doneHT <- HT.new
-  mapM_ (\k -> HT.insert todoHT k 1) ks
-  return (Buffer todoHT doneHT)
+processCardMap :: CardMap -> Int
+processCardMap cardM = tallyCounts resultingCards
+  where
+    cIDs = L.sort $ M.keys cardM
+    initialBuffer = initializeBuffer cIDs
+    (Buffer _ resultingCards) = processCardIDs cIDs cardM initialBuffer
 
-processCardMap :: [CardID] -> CardMap -> IO Int
-processCardMap cIDsToProcess'ordered cardM = do
-  initialBuffer <- initializeBuffer cIDsToProcess'ordered
-  (Buffer _ resultingCard) <- processCardIDs cIDsToProcess'ordered cardM initialBuffer
-  tallyCounts resultingCard
-
-solutionPart2 :: [String] -> IO (Maybe Int)
-solutionPart2 ls =
-  case mapM parseCard ls of
-    Nothing -> return Nothing
-    Just ts -> do
-      let cards = map snd ts
-      let cIDs = map getID cards
-      let cardM = mkCardMap cards
-      val <- processCardMap cIDs cardM
-      return (Just val)
+solutionPart2 :: [String] -> Maybe Int
+solutionPart2 =
+  return
+    . processCardMap
+    . mkCardMap
+    . map snd
+    <=< mapM parseCard
 
 solveDay4 :: FilePath -> IO ()
 solveDay4 input'path = do
@@ -204,7 +190,6 @@ solveDay4 input'path = do
 
   putStrLn $ "Solution to part 1: " ++ show (solutionPart1 input'lines)
 
-  answerPart2 <- solutionPart2 input'lines
-  putStrLn $ "Solution to part 2: " ++ show answerPart2
+  putStrLn $ "Solution to part 2: " ++ show (solutionPart2 input'lines)
 
   hClose input'handle
