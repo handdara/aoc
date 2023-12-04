@@ -1,6 +1,10 @@
 # Revision history for aoc23
 
-## 0.1.0.4 -- 2023-12-04
+## 0.1.4.1 -- 2023-12-04
+
+* Using HashMap instead of HashTable
+
+## 0.1.4.0 -- 2023-12-04
 
 * Day 4 Solution
 
