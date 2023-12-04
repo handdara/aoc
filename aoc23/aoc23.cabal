@@ -19,7 +19,9 @@ common shared-props
         turtle,
         text,
         bytestring,
-        file-embed
+        containers,
+        unordered-containers,
+        hashtables,
     default-extensions: OverloadedStrings
 
 common warnings

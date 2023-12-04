@@ -3,8 +3,6 @@ module Aoc.Solve.X
   )
 where
 
-import System.IO
-
 type Input = [String]
 
 solutionPart1 :: Input -> String
