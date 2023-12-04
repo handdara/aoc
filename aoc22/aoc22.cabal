@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               aoc22
-version:            0.1.0.2
+version:            0.1.0.3
 -- synopsis:
 -- description:
 license:            GPL-3.0-or-later
@@ -19,7 +19,7 @@ common shared-props
         turtle,
         text,
         bytestring,
-        file-embed
+        containers,
     default-extensions: OverloadedStrings
 
 common warnings
@@ -33,6 +33,7 @@ library
         Aoc.App, 
         Aoc.Solve.One,
         Aoc.Solve.Two,
+        Aoc.Solve.Three,
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src
