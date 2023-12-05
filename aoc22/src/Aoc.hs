@@ -1,6 +1,5 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Four,
     solveFunc,
   )
 where
@@ -20,4 +19,6 @@ solveFunc 2 Nothing _ = liftIO $ solveDay2 "input2.txt"
 solveFunc 2 (Just input'path) _ = liftIO $ solveDay2 input'path
 solveFunc 3 Nothing _ = liftIO $ solveDay3 "input3.txt"
 solveFunc 3 (Just input'path) _ = liftIO $ solveDay3 input'path
+solveFunc 4 Nothing _ = liftIO $ solveDay4 "input4.txt"
+solveFunc 4 (Just input'path) _ = liftIO $ solveDay4 input'path
 solveFunc _ _ _ = die "not implemented"
