@@ -6,6 +6,7 @@ where
 
 import Aoc.App
 import Aoc.Solve.Four
+import Aoc.Solve.Five
 import Aoc.Solve.One
 import Aoc.Solve.Three
 import Aoc.Solve.Two
@@ -21,4 +22,6 @@ solveFunc 3 Nothing _ = liftIO $ solveDay3 "input3.txt"
 solveFunc 3 (Just input'path) _ = liftIO $ solveDay3 input'path
 solveFunc 4 Nothing _ = liftIO $ solveDay4 "input4.txt"
 solveFunc 4 (Just input'path) _ = liftIO $ solveDay4 input'path
+solveFunc 5 Nothing _ = liftIO $ solveDay5 "input5.txt"
+solveFunc 5 (Just input'path) _ = liftIO $ solveDay5 input'path
 solveFunc _ _ _ = die "not implemented"
