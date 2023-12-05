@@ -1,10 +1,7 @@
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Aoc.Solve.Four
   ( solveDay4,
   )
 where
-
-import qualified Data.List as L
 
 type Input = [String]
 
@@ -12,10 +9,13 @@ type Range = (Int, Int)
 
 data Pair = Pair Range Range deriving (Show)
 
+rangeInRange :: Range -> Range -> Bool
 rangeInRange (lMin, lMax) (rMin, rMax) = lMin <= rMin && rMax <= lMax
 
+testPair :: Pair -> Bool
 testPair (Pair l r) = rangeInRange l r || rangeInRange r l
 
+testPairOverlap :: Pair -> Bool
 testPairOverlap (Pair (lMin, lMax) (rMin, rMax)) = not $ lMax < rMin || rMax < lMin
 
 parsePair :: String -> Pair
@@ -25,8 +25,10 @@ parsePair s = Pair (read lMin'str, read . tail $ lMax'str) (read rMin'str, read 
     (lMin'str,lMax'str) = span (/='-') lr
     (rMin'str,rMax'str) = span (/='-') . tail $ rr
 
+solutionPart1 :: [String] -> Int
 solutionPart1 = length . filter testPair . map parsePair
 
+solutionPart2 :: [String] -> Int
 solutionPart2 = length . filter testPairOverlap . map parsePair
 
 solveDay4 :: FilePath -> IO ()
