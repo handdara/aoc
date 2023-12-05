@@ -20,6 +20,6 @@ solveDay5 input'path = do
   putStrLn "Input: "
   mapM_ putStrLn input'lines
 
-  putStrLn $ "Solution to part 1: " ++ show (solutionPart1 input'lines)
+  putStrLn $ "Solution to part 1: " <> show (solutionPart1 input'lines)
 
-  putStrLn $ "Solution to part 2: " ++ show (solutionPart2 input'lines)
+  putStrLn $ "Solution to part 2: " <> show (solutionPart2 input'lines)
