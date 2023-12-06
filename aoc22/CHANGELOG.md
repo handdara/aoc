@@ -1,5 +1,9 @@
 # Revision history for aoc22
 
+## 0.1.6.0 -- 2023-12-06
+
+* Day 6 solution 
+
 ## 0.1.5.0 -- 2023-12-04
 
 * Day 5 solution 

@@ -5,9 +5,10 @@ module Aoc
 where
 
 import Aoc.App
-import Aoc.Solve.Four
 import Aoc.Solve.Five
+import Aoc.Solve.Four
 import Aoc.Solve.One
+import Aoc.Solve.Six
 import Aoc.Solve.Three
 import Aoc.Solve.Two
 import Turtle
@@ -24,4 +25,6 @@ solveFunc 4 Nothing _ = liftIO $ solveDay4 "input4.txt"
 solveFunc 4 (Just input'path) _ = liftIO $ solveDay4 input'path
 solveFunc 5 Nothing _ = liftIO $ solveDay5 "input5.txt"
 solveFunc 5 (Just input'path) _ = liftIO $ solveDay5 input'path
+solveFunc 6 Nothing _ = liftIO $ solveDay6 "input6.txt"
+solveFunc 6 (Just input'path) _ = liftIO $ solveDay6 input'path
 solveFunc _ _ _ = die "not implemented"

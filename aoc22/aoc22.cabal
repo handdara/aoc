@@ -36,6 +36,7 @@ library
         Aoc.Solve.Three,
         Aoc.Solve.Four,
         Aoc.Solve.Five,
+        Aoc.Solve.Six,
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src
