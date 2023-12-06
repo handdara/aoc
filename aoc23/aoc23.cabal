@@ -22,6 +22,7 @@ common shared-props
         containers,
         unordered-containers,
         hashtables,
+        deepseq,
     default-extensions: OverloadedStrings
 
 common warnings
