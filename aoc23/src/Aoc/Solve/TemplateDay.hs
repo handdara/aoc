@@ -6,10 +6,10 @@ where
 type Input = [String]
 
 solutionPart1 :: Input -> String
-solutionPart1 _ = "In Progress"
+solutionPart1 = const "In Progress"
 
 solutionPart2 :: Input -> String
-solutionPart2 _ = "In Progress"
+solutionPart2 = const "In Progress"
 
 solveDayX :: FilePath -> IO ()
 solveDayX input'path = do

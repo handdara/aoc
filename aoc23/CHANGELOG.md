@@ -1,6 +1,10 @@
 # Revision history for aoc23
 
-## 0.1.5.0 -- 2023-12-05
+## 0.1.6.0 -- 2023-12-06
+
+* Day 6 Solution
+
+## 0.1.5.0 -- 2023-12-06
 
 * Day 5 Solution
 
