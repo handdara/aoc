@@ -1,8 +1,9 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
-module Aoc.Solve.X
-  ( solveDayX,
+module Aoc.Solve.Seven
+  ( solveDay7,
     -- dbg
+    Input,
   )
 where
 
@@ -12,8 +13,8 @@ solutionPart1 = const ("In Progress" :: String)
 
 solutionPart2 = const ("In Progress" :: String) 
 
-solveDayX :: FilePath -> IO ()
-solveDayX input'path = do
+solveDay7 :: FilePath -> IO ()
+solveDay7 input'path = do
   input'string <- readFile input'path
 
   let input'lines = lines input'string
