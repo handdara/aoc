@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               aoc22
-version:            0.1.5.0
+version:            0.1.6.0
 -- synopsis:
 -- description:
 license:            GPL-3.0-or-later
