@@ -1,6 +1,6 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Eight,
+    module Aoc.Solve.Nine,
     solveFunc,
   )
 where
@@ -9,6 +9,7 @@ import Aoc.App
 import Aoc.Solve.Eight
 import Aoc.Solve.Five
 import Aoc.Solve.Four
+import Aoc.Solve.Nine
 import Aoc.Solve.One
 import Aoc.Solve.Seven
 import Aoc.Solve.Six
@@ -34,6 +35,6 @@ solveFunc 6 _ (Just input'path) _ = liftIO $ solveDay6 input'path
 solveFunc 7 _ Nothing _ = liftIO $ solveDay7 "input7.txt"
 solveFunc 7 _ (Just input'path) _ = liftIO $ solveDay7 input'path
 solveFunc 8 [] Nothing _ = liftIO $ solveDay8 "AAA" "input8.txt"
-solveFunc 8 [startNode] (Just input'path) _ = liftIO $ solveDay8 (unpack startNode) input'path 
+solveFunc 8 [startNode] (Just input'path) _ = liftIO $ solveDay8 (unpack startNode) input'path
 solveFunc 8 _ Nothing _ = die "expecting at least one extra input for day 8: starting node"
 solveFunc _ _ _ _ = die "Solution not implemented yet"
