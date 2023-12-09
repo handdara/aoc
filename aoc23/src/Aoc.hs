@@ -1,6 +1,6 @@
 module Aoc
   ( module Aoc.App,
-    -- module Aoc.Solve.Ten,
+    module Aoc.Solve.Ten,
     solveFunc,
   )
 where
@@ -15,7 +15,7 @@ import Aoc.Solve.Seven
 import Aoc.Solve.Six
 import Aoc.Solve.Three
 import Aoc.Solve.Two
--- import Aoc.Solve.Ten
+import Aoc.Solve.Ten
 import Data.Text (unpack)
 import Turtle
 import Prelude hiding (FilePath, log)
@@ -40,6 +40,6 @@ solveFunc 8 [startNode] (Just input'path) _ = liftIO $ solveDay8 (unpack startNo
 solveFunc 8 _ Nothing _ = die "expecting at least one extra input for day 8: starting node"
 solveFunc 9 _ Nothing _ = liftIO $ solveDay9 "input9.txt"
 solveFunc 9 _ (Just input'path) _ = liftIO $ solveDay9 input'path
--- solveFunc 10 _ Nothing _ = liftIO $ solveDay10 "input10.txt"
--- solveFunc 10 _ (Just input'path) _ = liftIO $ solveDay10 input'path
+solveFunc 10 _ Nothing _ = liftIO $ solveDay10 "input10.txt"
+solveFunc 10 _ (Just input'path) _ = liftIO $ solveDay10 input'path
 solveFunc _ _ _ _ = die "Solution not implemented yet"
