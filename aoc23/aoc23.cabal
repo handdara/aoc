@@ -26,7 +26,7 @@ common shared-props
     default-extensions: OverloadedStrings
 
 common warnings
-    ghc-options: -Wall
+    ghc-options: -Wall -threaded
 
 library
     import:           warnings
@@ -42,6 +42,7 @@ library
         Aoc.Solve.Six,
         Aoc.Solve.Seven,
         Aoc.Solve.Eight,
+        Aoc.Parse, 
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src

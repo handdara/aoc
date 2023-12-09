@@ -18,8 +18,8 @@ data Command
   = Solve
     { -- | the answer word given by the user
       day :: Int,
-      input :: Maybe FilePath,
-      output :: Maybe FilePath
+      extra :: [Text],
+      input, output :: Maybe FilePath
     }
   deriving (Show)
 

@@ -6,6 +6,9 @@ import qualified Aoc as A
 dayParser :: Parser Int
 dayParser = argInt "day" "which day to solve"
 
+extraParser :: Parser [Text]
+extraParser = many $ argText "extra" "extra inputs, needed for days: 8"
+
 inputParser :: Parser FilePath
 inputParser = optPath "input" 'i' "input file to use, default: \"input<DAY>.txt\""
 
@@ -16,6 +19,7 @@ solveParser :: Parser A.Command
 solveParser = 
   A.Solve 
     <$> dayParser
+    <*> extraParser
     <*> optional inputParser
     <*> optional outputParser
 
@@ -34,7 +38,7 @@ parser = (,) <$> commandParser <*> optsParser
 aoc :: (MonadIO io) => A.Command -> A.Opts -> io ()
 aoc command _ = do
   case command of
-    A.Solve day in'm out'm -> A.solveFunc day in'm out'm
+    A.Solve day extras in'm out'm -> A.solveFunc day extras in'm out'm 
 
 main :: IO ()
 main = do
