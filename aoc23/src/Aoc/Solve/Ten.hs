@@ -158,14 +158,8 @@ getAdjacentToLoopCoord cs (x, y) = S.fromList . filter (`S.notMember` cs) $ cs'a
   where
     cs'adj = [(x + 1, y), (x - 1, y), (x, y - 1), (x, y + 1)]
 
--- getLoopAdj :: PipeDists -> S.Set Coord
-getLoopAdj =
-  foldr1 S.union
-    . (S.map <$> getAdjacentToLoopCoord <*> id)
-    . stripCoords
-
-solutionPart2 :: Input -> S.Set Coord
-solutionPart2 = getLoopAdj . walkFromS . prepareInput
+solutionPart2 :: Input -> PipeDists
+solutionPart2 = walkFromS . prepareInput
 
 solveDay10 :: FilePath -> IO ()
 solveDay10 input'path = do
