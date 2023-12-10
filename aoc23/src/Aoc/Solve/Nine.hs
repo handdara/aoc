@@ -38,14 +38,8 @@ propSingle = scanr propPair [0]
 solutionPart1 :: Input -> SigVal
 solutionPart1 = sum . map (last . head . propSingle . getDiscDerivs) . prepareInput
 
-backpropPair :: Signal -> Signal -> Signal
-backpropPair y dy = head y - head dy : y
-
-backpropSingle :: [Signal] -> [Signal]
-backpropSingle = scanr backpropPair [0]
-
 solutionPart2 :: Input -> SigVal
-solutionPart2 = sum . map (head . head . backpropSingle . getDiscDerivs) .prepareInput
+solutionPart2 = sum . map (last . head . propSingle . getDiscDerivs . reverse) . prepareInput
 
 solveDay9 :: FilePath -> IO ()
 solveDay9 input'path = do
