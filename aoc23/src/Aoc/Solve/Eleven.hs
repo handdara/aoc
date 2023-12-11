@@ -3,6 +3,9 @@
 module Aoc.Solve.Eleven
   ( solveDay11,
     -- dbg
+    Input,
+    solutionPart1,
+    solutionPart2,
   )
 where
 
