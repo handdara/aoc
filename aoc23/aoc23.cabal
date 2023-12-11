@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               aoc23
-version:            0.1.10.1
+version:            0.1.11.0
 -- synopsis:
 -- description:
 license:            GPL-3.0-or-later
@@ -44,6 +44,7 @@ library
         Aoc.Solve.Eight,
         Aoc.Solve.Nine,
         Aoc.Solve.Ten,
+        Aoc.Solve.Eleven,
         Aoc.Parse, 
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
