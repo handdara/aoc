@@ -1,5 +1,9 @@
 # Revision history for aoc23
 
+## 0.1.12.0 -- 2023-12-XX
+
+* Day 12 Solution
+
 ## 0.1.11.0 -- 2023-12-11
 
 * Day 11 Solution

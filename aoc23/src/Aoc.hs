@@ -1,5 +1,6 @@
 module Aoc
   ( module Aoc.App,
+    module Aoc.Solve.Twelve,
     solveFunc,
   )
 where
@@ -16,6 +17,7 @@ import Aoc.Solve.Three
 import Aoc.Solve.Two
 import Aoc.Solve.Ten
 import Aoc.Solve.Eleven
+import Aoc.Solve.Twelve
 import Data.Text (unpack)
 import Turtle
 import Prelude hiding (FilePath, log)
@@ -44,4 +46,6 @@ solveFunc 10 _ Nothing _ = liftIO $ solveDay10 "input10.txt"
 solveFunc 10 _ (Just input'path) _ = liftIO $ solveDay10 input'path
 solveFunc 11 _ Nothing _ = liftIO $ solveDay11 "input11.txt"
 solveFunc 11 _ (Just input'path) _ = liftIO $ solveDay11 input'path
+solveFunc 12 _ Nothing _ = liftIO $ solveDay12 "input12.txt"
+solveFunc 12 _ (Just input'path) _ = liftIO $ solveDay12 input'path
 solveFunc _ _ _ _ = die "Solution not implemented yet"
