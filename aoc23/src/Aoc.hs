@@ -1,6 +1,5 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Ten,
     solveFunc,
   )
 where

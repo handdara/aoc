@@ -1,8 +1,12 @@
 # Revision history for aoc23
 
-## 0.1.10.0 -- 2023-12-XX
+## 0.1.10.1 -- 2023-12-10
 
-* Day 10 Solution
+* Day 10 Solution, both parts
+
+## 0.1.10.0 -- 2023-12-10
+
+* Day 10 Solution, part 1
 
 ## 0.1.9.0 -- 2023-12-09
 
