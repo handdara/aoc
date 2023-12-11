@@ -1,8 +1,8 @@
 # Revision history for aoc23
 
-## 0.1.12.0 -- 2023-12-XX
+## 0.1.12.0 -- 2023-12-11
 
-* Day 12 Solution
+* Day 12 setup & app command restructure
 
 ## 0.1.11.0 -- 2023-12-11
 
