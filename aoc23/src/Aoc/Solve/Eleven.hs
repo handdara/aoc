@@ -31,6 +31,8 @@ type AxisVal = Int
 
 type Coord = (AxisVal, AxisVal)
 
+type Vector = (AxisVal, AxisVal)
+
 type Range = (AxisVal, AxisVal)
 
 data Line = Line Coord Direction
@@ -93,8 +95,25 @@ expandEmptyLines = undefined
 expandGalaxy :: GalaxyMap -> GalaxyMap
 expandGalaxy = expandEmptyLines <*> fdEmptyLines
 
-solutionPart1 :: Input -> [Line]
-solutionPart1 = fdEmptyLines . prepareInput
+getGalaxyPairs :: GalaxyMap -> [(Coord, Coord)]
+getGalaxyPairs (GalaxyMap _ _ gs) = do
+  l <- gs
+  r <- gs
+  if l /= r
+    then return (l,r)
+    else []
+
+diff :: Coord -> Coord -> Vector
+diff (xl, yl) (xr, yr) = (xr - xl, yr - yl)
+
+normL1 :: Vector -> AxisVal
+normL1 (x, y) = abs x + abs y
+
+sumDistances :: GalaxyMap -> AxisVal
+sumDistances = sum . map (normL1 . uncurry diff) . getGalaxyPairs
+
+solutionPart1 :: Input -> AxisVal
+solutionPart1 = sumDistances . expandGalaxy . prepareInput
 
 solutionPart2 :: Input -> String
 solutionPart2 = const ("In Progress" :: String)
