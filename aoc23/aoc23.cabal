@@ -16,6 +16,7 @@ common shared-props
     default-language: Haskell2010
     build-depends:  
         base ^>=4.17.2.0, 
+        time,
         turtle,
         text,
         bytestring,
@@ -23,6 +24,7 @@ common shared-props
         unordered-containers,
         hashtables,
         deepseq,
+        parallel,
     default-extensions: OverloadedStrings
 
 common warnings
@@ -63,7 +65,7 @@ executable aoc23
         base ^>=4.17.2.0,
         aoc23
 
-    ghc-options: -threaded +RTS -N32 -RTS
+    ghc-options: -threaded -rtsopts
 
     hs-source-dirs:   app
     default-language: Haskell2010
