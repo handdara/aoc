@@ -65,9 +65,9 @@ aoc command _ = do
     A.Day10 (Just fp) -> liftIO $ A.solveDay10 fp
     A.Day11 Nothing -> liftIO $ A.solveDay11 "input11.txt"
     A.Day11 (Just fp) -> liftIO $ A.solveDay11 fp
-    _ -> echo "This day hasn't been solved yet!"
     A.Day12 Nothing -> liftIO $ A.solveDay12 "input12.txt"
     A.Day12 (Just fp) -> liftIO $ A.solveDay12 fp
+    _ -> echo "This day hasn't been solved yet!"
 
 main :: IO ()
 main = do

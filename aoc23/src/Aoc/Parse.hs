@@ -9,11 +9,19 @@ module Aoc.Parse
     intParser,
     genericCharParser,
     lineEmpty,
+    (<=<),
+    ($>),
+    (<|>),
+    some,
+    many,
+    optional,
   )
 where
 
 import Control.Applicative
-import Data.Char (isSpace, isDigit)
+import Control.Monad ((<=<))
+import Data.Char (isDigit, isSpace)
+import Data.Functor (($>))
 
 newtype Parser a = Parser
   { runParser :: String -> Maybe (String, a)
@@ -78,7 +86,7 @@ mkSepByParser s e =
   (:)
     <$> e
     <*> many (s *> e)
-      <|> pure []
+    <|> pure []
 
 whiteParser :: Parser String
 whiteParser = mkSpanParser isSpace
@@ -94,4 +102,3 @@ genericCharParser = Parser f
 
 lineEmpty :: String -> Bool
 lineEmpty = all isSpace
-
