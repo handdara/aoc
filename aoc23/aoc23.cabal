@@ -34,6 +34,7 @@ library
     exposed-modules:  Aoc
     other-modules:
         Aoc.App, 
+        Aoc.Testing, 
         Aoc.Solve.One,
         Aoc.Solve.Two,
         Aoc.Solve.Three,
@@ -62,7 +63,7 @@ executable aoc23
         base ^>=4.17.2.0,
         aoc23
 
-    ghc-options: -threaded
+    ghc-options: -threaded +RTS -N32 -RTS
 
     hs-source-dirs:   app
     default-language: Haskell2010

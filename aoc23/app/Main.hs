@@ -30,6 +30,7 @@ commandParser =
     <|> subcommand "ten" "solve day 10 of advent of code" (A.Day10 <$> optional inputParser)
     <|> subcommand "eleven" "solve day 11 of advent of code" (A.Day11 <$> optional inputParser)
     <|> subcommand "twelve" "solve day 12 of advent of code" (A.Day12 <$> optional inputParser)
+    <|> subcommand "testing" "dummy testing command" (A.Testing <$> extraParser)
 
 optsParser :: Parser A.Opts
 optsParser =
@@ -42,6 +43,8 @@ parser = (,) <$> commandParser <*> optsParser
 aoc :: (MonadIO io) => A.Command -> A.Opts -> io ()
 aoc command _ = do
   case command of
+    A.Testing [n] -> liftIO $ A.testing n
+    A.Testing _ -> die "expecting a single extra input for testing function" 
     A.Day1 Nothing -> liftIO $ A.solveDay1 "input1.txt"
     A.Day1 (Just fp) -> liftIO $ A.solveDay1 fp
     A.Day2 Nothing -> liftIO $ A.solveDay2 "input2.txt"

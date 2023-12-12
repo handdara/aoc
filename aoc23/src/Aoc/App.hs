@@ -40,6 +40,7 @@ data Command
   | Day23 [Text] (Maybe FilePath) (Maybe FilePath)
   | Day24 [Text] (Maybe FilePath) (Maybe FilePath)
   | Day25 [Text] (Maybe FilePath) (Maybe FilePath)
+  | Testing [Text]
   deriving (Show)
 
 -- | Type encompassing the command line flags
