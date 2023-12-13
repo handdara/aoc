@@ -29,7 +29,7 @@ commandParser =
     <|> subcommand "nine" "solve day 9 of advent of code" (A.Day9 <$> optional inputParser)
     <|> subcommand "ten" "solve day 10 of advent of code" (A.Day10 <$> optional inputParser)
     <|> subcommand "eleven" "solve day 11 of advent of code" (A.Day11 <$> optional inputParser)
-    <|> subcommand "twelve" "solve day 12 of advent of code" (A.Day12 <$> optional inputParser)
+    <|> subcommand "twelve" "solve day 12 of advent of code" (A.Day12 <$> extraParser <*> optional inputParser)
     <|> subcommand "testing" "dummy testing command" (A.Testing <$> extraParser)
 
 optsParser :: Parser A.Opts
@@ -68,8 +68,14 @@ aoc command _ = do
     A.Day10 (Just fp) -> liftIO $ A.solveDay10 fp
     A.Day11 Nothing -> liftIO $ A.solveDay11 "input11.txt"
     A.Day11 (Just fp) -> liftIO $ A.solveDay11 fp
-    A.Day12 Nothing -> liftIO $ A.solveDay12 "input12.txt"
-    A.Day12 (Just fp) -> liftIO $ A.solveDay12 fp
+    A.Day12 [] fp'm -> liftIO $ do
+      putStrLn "Warning: Using default fold number 1"
+      case fp'm of
+        Nothing -> A.solveDay12 "1" "input12.txt" 
+        Just fp -> A.solveDay12 "1" fp 
+    A.Day12 [fn] Nothing -> liftIO $ A.solveDay12 (unpack fn) "input12.txt" 
+    A.Day12 [fn] (Just fp) -> liftIO $ A.solveDay12 (unpack fn) fp 
+    A.Day12 _ _ -> die "expecting a single extra input for day 12: the fold number for records"    
     _ -> echo "This day hasn't been solved yet!"
 
 main :: IO ()
