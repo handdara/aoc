@@ -1,32 +1,33 @@
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
-module Aoc.Solve.Twelve where
+-- module Aoc.Solve.Twelve where
 
--- module Aoc.Solve.Twelve
---   ( solveDay12,
---     module Aoc.Parse,
---     -- dbg
---     Input,
---     Status (..),
---     Group,
---     RecordRow (..),
---     SpringRecord,
---     solutionPart1,
---     solutionPart2,
---     calcPresentGroups,
---     countPossible,
---     springRecordP,
---     parseInput,
---   )
--- where
+module Aoc.Solve.Twelve
+  ( solveDay12,
+    module Aoc.Parse,
+    -- dbg
+    Input,
+    Status (..),
+    Group,
+    RecordRow (..),
+    SpringRecord,
+    solutionPart1,
+    solutionPart2,
+    calcPresentGroups,
+    countPossible,
+    springRecordP,
+    parseInput,
+  )
+where
 
 import Aoc.Parse
+import Control.DeepSeq (deepseq)
 import Control.Parallel.Strategies
 import qualified Data.List as L
+import Data.Maybe (fromMaybe)
 import Data.Time.Clock (diffUTCTime, getCurrentTime)
 import Debug.Trace (trace)
-import Control.DeepSeq (deepseq)
 
 -- * Types
 
@@ -118,6 +119,7 @@ countPossible gs sl
         let sl'ok = countPossible gs (gs'known <> (OK : gs'rest))
             sl'broken = countPossible gs (gs'known <> (Broken : gs'rest))
          in sl'ok `seq` sl'ok + sl'broken
+
 -- in sl'ok + sl'broken
 
 -- countAll :: SpringRecord -> [Integer]
@@ -127,7 +129,8 @@ countAll countingFunc rows = results `deepseq` results
     results =
       map (fromIntegral . \(RecordRow sl gs) -> countingFunc gs sl) rows
         `using` parList rdeepseq
-        -- `using` parList rseq
+
+-- `using` parList rseq
 
 solutionPart1 :: Input -> Maybe Integer
 solutionPart1 =
@@ -149,7 +152,7 @@ validSpacing ::
   Bool
 validSpacing [] (_ : _) (_ : _) = False
 validSpacing sl [] [] = Broken `notElem` sl
-validSpacing sl (spc : spcs) (g : gs) = 
+validSpacing sl (spc : spcs) (g : gs) =
   let (l, m'r) = splitAt spc sl
       (m, r) = splitAt g m'r
    in ((Broken `notElem` l) && (OK `notElem` m))
@@ -159,24 +162,42 @@ validSpacing _ _ _ = error "shouldn't reach here"
 renderSG :: [Group] -> [Group] -> String
 renderSG spcs grps =
   foldMap show . mconcat $
-      zipWith (\x y -> replicate x OK <> replicate y Broken) spcs grps
+    zipWith (\x y -> replicate x OK <> replicate y Broken) spcs grps
+
+-- explodeOnIdx :: Int -> [Group] -> [Group] -> StatusList -> [[Group]]
+-- explodeOnIdx i spcs gs sl =
+--   tracer
+--     ( "explodeOnIdx:\n\t i = " <> show i
+--         <> "\n\tspcs = " <> show spcs
+--         <> "\n\tgs = " <> show gs
+--         <> "\n\tsl = " <> foldMap show sl
+--         <> "\n\tres= " <> renderSG spcs gs
+--         <> "\n\texploded: "
+--     )
+--     $ case splitAt i spcs of
+--       (spcs'l, spc : spcs'r) -> trace ("spcs'l = " <> show spcs'l <> ", spc = " <> show spc) $ do
+--         let upTo'max = tracer "upTo'max = " $ length sl - sum gs - sum spcs'l - sum spcs'r
+--         let gs'l = take (length spcs'l) gs
+--         let num'l = tracer "numl'l = " $ sum spcs'l + sum gs'l
+--         let nextBroken'maybe =
+--               snd 
+--                 <$> tracer "find returned: " 
+--                   (L.find (\(x, i') -> num'l < i' && x == Broken) (zip sl [0 ..]))
+--         let nextBroken = tracer "nextBroken: " $ fromMaybe upTo'max nextBroken'maybe
+--         spc' <- [spc .. min upTo'max (nextBroken - num'l)]
+--         return $ spcs'l <> (spc' : spcs'r)
+--       (_, []) -> [spcs]
 
 explodeOnIdx :: Int -> [Group] -> [Group] -> StatusList -> [[Group]]
 explodeOnIdx i spcs gs sl =
-  -- trace
-  --   ( "explodeOnIdx:\n\t i = " <> show i
-  --       <> "\n\tspcs = " <> show spcs
-  --       <> "\n\tgs = " <> show gs
-  --       <> "\n\tsl = " <> foldMap show sl
-  --       <> "\n\tres= " <> renderSG spcs gs 
-  --   ) $
     case splitAt i spcs of
       (spcs'l, spc : spcs'r) -> do
+        let numToLeft = sum $ zipWith (+) spcs'l gs
         let upTo'max = length sl - sum gs - sum spcs'l - sum spcs'r
-        let gs'l = take (length spcs'l) gs
-        let num'l = sum spcs'l + sum gs'l
-        let fstBroken = head . dropWhile (\(x,i') -> num'l <= i' && x/=Broken) $ zip sl [0..]
-        spc' <- [spc .. upTo'max]
+        let nextBroken = 
+              fromMaybe upTo'max $ 
+                L.elemIndex Broken (drop numToLeft sl)
+        spc' <- [spc .. min upTo'max nextBroken]
         return $ spcs'l <> (spc' : spcs'r)
       (_, []) -> [spcs]
 
@@ -187,7 +208,7 @@ cntGrpArrgs ::
   StatusList ->
   Int
 cntGrpArrgs i spcs gs sl
-  -- | i > length spcs = trace ("cntGrpArrgs: i = "<>show i <>", len(spcs) = " <>show (length spcs)) 0
+  -- \| i > length spcs = trace ("cntGrpArrgs: i = "<>show i <>", len(spcs) = " <>show (length spcs)) 0
   | i > length spcs = if validSpacing sl spcs gs then 1 else 0
   | otherwise =
       -- let spcs'new = tracer "cntGrpArrgs:\n\t expanded list = " $ explodeOnIdx i spcs gs sl
@@ -208,9 +229,9 @@ solutionPart2 foldNum =
     <=< parseInput
 
 solveDay12 :: String -> FilePath -> IO ()
-solveDay12 foldNum'str input'path = do
+solveDay12 unfoldNum'str input'path = do
   input'string <- readFile input'path
-  let foldNum = read foldNum'str :: Int
+  let unfoldNum = read unfoldNum'str :: Int
 
   -- putStrLn "Input: "
   -- putStrLn input'string
@@ -223,7 +244,7 @@ solveDay12 foldNum'str input'path = do
   t0 <- getCurrentTime
   putStrLn $ "Solution to part 1: " <> show (solutionPart1 input'string)
   t1 <- getCurrentTime
-  putStrLn $ "Solution to part 2: " <> show (solutionPart2 foldNum input'string)
+  putStrLn $ "Solution to part 2: " <> show (solutionPart2 unfoldNum input'string)
   t2 <- getCurrentTime
 
   let durPart1 = diffUTCTime t1 t0
