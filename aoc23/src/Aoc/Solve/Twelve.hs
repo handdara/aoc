@@ -18,6 +18,8 @@ module Aoc.Solve.Twelve
     countPossible,
     springRecordP,
     parseInput,
+    cntGrpArrgs,
+    arrangements,
   )
 where
 
@@ -107,7 +109,7 @@ calcPresentGroups sl =
 portionInvalid :: [Group] -> StatusList -> Bool
 portionInvalid gs sl = not . and $ zipWith (==) (calcPresentGroups sl) gs
 
-countPossible :: [Group] -> StatusList -> Int
+countPossible :: [Group] -> StatusList -> Integer
 countPossible gs sl
   | portionInvalid gs sl = 0
   | otherwise = case break (== Unknown) sl of
@@ -122,9 +124,8 @@ countPossible gs sl
 
 -- in sl'ok + sl'broken
 
--- countAll :: SpringRecord -> [Integer]
-countAll :: ([Group] -> StatusList -> Int) -> [RecordRow] -> [Integer]
-countAll countingFunc rows = results `deepseq` results
+countAll :: ([Group] -> StatusList -> Integer) -> [RecordRow] -> [Integer]
+countAll countingFunc rows = results
   where
     results =
       map (fromIntegral . \(RecordRow sl gs) -> countingFunc gs sl) rows
@@ -145,11 +146,7 @@ unfoldRecordRow foldNum (RecordRow sl gs) =
     (L.intercalate [Unknown] $ replicate foldNum sl)
     (mconcat $ replicate foldNum gs)
 
-validSpacing ::
-  StatusList ->
-  [Group] ->
-  [Group] ->
-  Bool
+validSpacing :: StatusList -> [Group] -> [Group] -> Bool
 validSpacing [] (_ : _) (_ : _) = False
 validSpacing sl [] [] = Broken `notElem` sl
 validSpacing sl (spc : spcs) (g : gs) =
@@ -164,58 +161,106 @@ renderSG spcs grps =
   foldMap show . mconcat $
     zipWith (\x y -> replicate x OK <> replicate y Broken) spcs grps
 
--- explodeOnIdx :: Int -> [Group] -> [Group] -> StatusList -> [[Group]]
--- explodeOnIdx i spcs gs sl =
---   tracer
---     ( "explodeOnIdx:\n\t i = " <> show i
---         <> "\n\tspcs = " <> show spcs
---         <> "\n\tgs = " <> show gs
---         <> "\n\tsl = " <> foldMap show sl
---         <> "\n\tres= " <> renderSG spcs gs
---         <> "\n\texploded: "
---     )
---     $ case splitAt i spcs of
---       (spcs'l, spc : spcs'r) -> trace ("spcs'l = " <> show spcs'l <> ", spc = " <> show spc) $ do
---         let upTo'max = tracer "upTo'max = " $ length sl - sum gs - sum spcs'l - sum spcs'r
---         let gs'l = take (length spcs'l) gs
---         let num'l = tracer "numl'l = " $ sum spcs'l + sum gs'l
---         let nextBroken'maybe =
---               snd 
---                 <$> tracer "find returned: " 
---                   (L.find (\(x, i') -> num'l < i' && x == Broken) (zip sl [0 ..]))
---         let nextBroken = tracer "nextBroken: " $ fromMaybe upTo'max nextBroken'maybe
---         spc' <- [spc .. min upTo'max (nextBroken - num'l)]
---         return $ spcs'l <> (spc' : spcs'r)
---       (_, []) -> [spcs]
+checkSingleSpcGrp :: StatusList -> Group -> Group -> Bool
+checkSingleSpcGrp sl'right spc g =
+  let (l, m'_) = splitAt spc sl'right
+      (m, _) = splitAt g m'_
+   in ((Broken `notElem` l) && (OK `notElem` m))
 
 explodeOnIdx :: Int -> [Group] -> [Group] -> StatusList -> [[Group]]
 explodeOnIdx i spcs gs sl =
-    case splitAt i spcs of
-      (spcs'l, spc : spcs'r) -> do
-        let numToLeft = sum $ zipWith (+) spcs'l gs
-        let upTo'max = length sl - sum gs - sum spcs'l - sum spcs'r
-        let nextBroken = 
-              fromMaybe upTo'max $ 
-                L.elemIndex Broken (drop numToLeft sl)
-        spc' <- [spc .. min upTo'max nextBroken]
-        return $ spcs'l <> (spc' : spcs'r)
-      (_, []) -> [spcs]
+  case splitAt i spcs of -- 'l := to the left, 'r := to the right
+    (spcs'l, spc : spcs'r) -> do
+      let upTo'max = length sl - sum gs - sum spcs'l - sum spcs'r
+      let sl'r = drop (sum $ zipWith (+) spcs'l gs) sl
+      let nextBroken = fromMaybe upTo'max $ L.elemIndex Broken sl'r
+      spc' <- [spc .. min upTo'max nextBroken]
+      ([spcs'l <> (spc' : spcs'r) | checkSingleSpcGrp sl'r spc' (gs !! i)])
+    (_, []) -> [spcs]
 
-cntGrpArrgs ::
-  Int ->
-  [Group] ->
-  [Group] ->
-  StatusList ->
-  Int
+cntGrpArrgs :: Int -> [Group] -> [Group] -> StatusList -> Integer
 cntGrpArrgs i spcs gs sl
-  -- \| i > length spcs = trace ("cntGrpArrgs: i = "<>show i <>", len(spcs) = " <>show (length spcs)) 0
   | i > length spcs = if validSpacing sl spcs gs then 1 else 0
   | otherwise =
-      -- let spcs'new = tracer "cntGrpArrgs:\n\t expanded list = " $ explodeOnIdx i spcs gs sl
       let spcs'new = explodeOnIdx i spcs gs sl
-       in sum . map (\sn -> cntGrpArrgs (i + 1) sn gs sl) $ spcs'new
+          arrgs'new =
+            map (\sn -> cntGrpArrgs (i + 1) sn gs sl) spcs'new
+              `using` parList rdeepseq
+       in sum arrgs'new
 
-cntAllGrpArrgs :: [Group] -> StatusList -> Int
+arrangements :: StatusList -> [Group] -> [Group] -> Int -> Integer
+arrangements [] [] [] _ =
+  -- trace
+  --   ( "\narrangements: vs=[], and grps nonempty, i.e. A([],[],i) = 1"
+  --     <> "\n\t(how many ways can we arrange zero things into zero buckets?)"
+  --   )
+  1
+arrangements [] _ _ _ =
+  -- trace "\narrangements: vs=[], but grps nonempty, i.e. A([],g,i) = 0"
+  0
+arrangements vs [spc] [grp] _ =
+  -- tracer
+  --   ( "arrangements: [spc] = " <> show spc
+  --     <> ", [grp] = " <> show grp
+  --     <> ", vs = " <> show vs
+  --     <> "\n returning: "
+  --   ) $
+  -- let maxSpc = tracer "\nmaxSpc = " $ length vs - grp
+  --     nextBroken = tracer "nextBroken = " $ fromMaybe maxSpc $ L.elemIndex Broken vs
+  --     spcs'possible = tracer "spcs'possible = " [spc .. min maxSpc nextBroken]
+  let maxSpc = length vs - grp
+      nextBroken = fromMaybe maxSpc $ L.elemIndex Broken vs
+      spcs'possible = [spc .. min maxSpc nextBroken]
+   in fromIntegral . length . filter (\spc' -> validSpacing vs [spc'] [grp]) $ spcs'possible
+arrangements vs [] [] _ =
+  -- tracer
+  --   ( "\narrangements: [spc] = []"
+  --     <> ", [grp] = []"
+  --     <> ", vs = " <> show vs
+  --     <> "\n\treturning "
+  --   ) $
+  if Broken `elem` vs then 0 else 1
+arrangements vs spcs grps i =
+  let cardG = length spcs
+      grpSizes = tail . scanl (+) 0 $ zipWith (+) spcs grps
+      fstG = head grpSizes
+      i'fixed'maybe =
+        if i /= 0
+          then L.findIndex (\i' -> (fstG <= i') && vs !! i' == OK) [0 .. length vs - 1]
+          else Just 0
+   in case i'fixed'maybe of
+        Nothing -> cntAllGrpArrgs grps vs
+        Just i'split ->
+          -- sum . tracer "j=1..G : " $
+          sum $
+            do
+              j <- [0 .. cardG]
+              let (vs'l, vs'r) = splitAt i'split vs
+                  -- il = length vs'l `div` 2
+                  -- ir = length vs'r `div` 2
+                  il = 0
+                  ir = 1
+              let (spcs'l, spcs'r) = splitAt j spcs
+                  (grps'l, grps'r) = splitAt j grps
+                  lRes = arrangements vs'l spcs'l grps'l il
+                  rRes = arrangements vs'r spcs'r grps'r ir
+              return $ 
+                -- trace
+                --   ( "\narrangements: i = " <> show i
+                --       <> "\ngroupBorders = " <> show grpSizes
+                --       <> "\narrangements: i'split = " <> show i'split
+                --       <> ", j = " <> show j
+                --       <> "\nspcs = " <> show spcs
+                --       <> "\ngrps = " <> show grps
+                --       <> "\n(vs'l,vs'r) = " <> show (vs'l, vs'r)
+                --       <> "\n(spcs'l,spcs'r) = " <> show (spcs'l, spcs'r)
+                --       <> "\n(grps'l,grps'r) = " <> show (grps'l, grps'r)
+                --       <> "\n left result = " <> show lRes
+                --       <> "\nright result = " <> show rRes
+                --   ) $ 
+                  lRes * rRes
+
+cntAllGrpArrgs :: [Group] -> StatusList -> Integer
 cntAllGrpArrgs gs = cntGrpArrgs 0 spaces gs
   where
     spaces = 0 : replicate (length gs - 1) 1 :: [Group]
@@ -225,6 +270,19 @@ solutionPart2 foldNum =
   return
     . sum
     . countAll cntAllGrpArrgs
+    . map (unfoldRecordRow foldNum)
+    <=< parseInput
+
+cntAllGrpArrgs' :: StatusList -> [Group] -> Integer
+cntAllGrpArrgs' vs grps = arrangements vs spcs grps 0
+  where
+    spcs = 0 : replicate (length grps - 1) 1 :: [Group]
+
+-- solutionPart2 :: Int -> Input -> Maybe Integer
+solutionPart2' foldNum =
+  return
+    . sum
+    . countAll (flip cntAllGrpArrgs')
     . map (unfoldRecordRow foldNum)
     <=< parseInput
 
@@ -244,11 +302,16 @@ solveDay12 unfoldNum'str input'path = do
   t0 <- getCurrentTime
   putStrLn $ "Solution to part 1: " <> show (solutionPart1 input'string)
   t1 <- getCurrentTime
-  putStrLn $ "Solution to part 2: " <> show (solutionPart2 unfoldNum input'string)
+  -- putStrLn $ "Solution to part 2: " <> show (solutionPart2 unfoldNum input'string)
   t2 <- getCurrentTime
+  putStrLn $ "Solution to part 2 (new): " <> show (solutionPart2' unfoldNum input'string)
+  t3 <- getCurrentTime
 
   let durPart1 = diffUTCTime t1 t0
   putStrLn $ "Part 1 Solution time: " <> show durPart1
 
-  let durPart2 = diffUTCTime t2 t1
-  putStrLn $ "Part 2 Solution time: " <> show durPart2
+  -- let durPart2 = diffUTCTime t2 t1
+  -- putStrLn $ "Part 2 Solution time: " <> show durPart2
+
+  let durPart3 = diffUTCTime t3 t2
+  putStrLn $ "Part 2 Solution time (new): " <> show durPart3
