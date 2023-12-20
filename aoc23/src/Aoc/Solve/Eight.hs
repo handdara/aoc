@@ -6,9 +6,7 @@ module Aoc.Solve.Eight
 where
 
 import Aoc.Parse
-import Control.Applicative
-import Control.Monad (replicateM, (<=<))
-import Data.Functor (($>))
+import Control.Monad (replicateM)
 import Data.Map.Strict ((!))
 import qualified Data.Map.Strict as M
 

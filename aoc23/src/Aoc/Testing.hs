@@ -5,7 +5,6 @@ where
 
 import Data.Text hiding (map)
 import Control.DeepSeq
-import Control.Parallel
 import Control.Parallel.Strategies
 import System.CPUTime
 

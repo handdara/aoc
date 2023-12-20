@@ -30,6 +30,7 @@ commandParser =
     <|> subcommand "ten" "solve day 10 of advent of code" (A.Day10 <$> optional inputParser)
     <|> subcommand "eleven" "solve day 11 of advent of code" (A.Day11 <$> optional inputParser)
     <|> subcommand "twelve" "solve day 12 of advent of code" (A.Day12 <$> extraParser <*> optional inputParser)
+    <|> subcommand "thirteen" "solve day 13 of advent of code" (A.Day13 <$> optional inputParser)
     <|> subcommand "testing" "dummy testing command" (A.Testing <$> extraParser)
 
 optsParser :: Parser A.Opts
@@ -76,7 +77,9 @@ aoc command _ = do
     A.Day12 [fn] Nothing -> liftIO $ A.solveDay12 (unpack fn) "input12.txt" 
     A.Day12 [fn] (Just fp) -> liftIO $ A.solveDay12 (unpack fn) fp 
     A.Day12 _ _ -> die "expecting a single extra input for day 12: the fold number for records"    
-    _ -> echo "This day hasn't been solved yet!"
+    A.Day13 Nothing -> liftIO $ A.solveDay13 "input13.txt"
+    A.Day13 (Just fp) -> liftIO $ A.solveDay13 fp
+    _ -> echo "This day hasn't been started yet!"
 
 main :: IO ()
 main = do

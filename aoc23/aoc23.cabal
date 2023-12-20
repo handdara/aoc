@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               aoc23
-version:            0.1.12.0
+version:            0.1.13.0
 -- synopsis:
 -- description:
 license:            GPL-3.0-or-later
@@ -25,6 +25,8 @@ common shared-props
         hashtables,
         deepseq,
         parallel,
+        massiv,
+        array,
     default-extensions: OverloadedStrings
 
 common warnings
@@ -49,6 +51,7 @@ library
         Aoc.Solve.Ten,
         Aoc.Solve.Eleven,
         Aoc.Solve.Twelve,
+        Aoc.Solve.Thirteen,
         Aoc.Parse, 
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
