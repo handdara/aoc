@@ -1,5 +1,6 @@
 module Aoc
   ( module Aoc.App,
+    module Aoc.Solve.Fourteen,
     testing,
     solveDay1,
     solveDay2,
@@ -28,6 +29,7 @@ import Aoc.Solve.Seven
 import Aoc.Solve.Six
 import Aoc.Solve.Ten
 import Aoc.Solve.Thirteen
+import Aoc.Solve.Fourteen
 import Aoc.Solve.Three
 import Aoc.Solve.Twelve
 import Aoc.Solve.Two
