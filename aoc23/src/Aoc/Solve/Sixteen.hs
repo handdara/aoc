@@ -9,7 +9,49 @@ module Aoc.Solve.Sixteen
   )
 where
 
+import Data.Monoid (Sum)
+import qualified Data.Array.IArray as A
+
+-- * Types
+
 type Input = [String]
+
+data Direction = East | North | West | South 
+  deriving (Eq, Ord)
+
+data Tile = Empty | VSplit | HSplit | UMirror | DMirror 
+  deriving (Eq, Ord)
+
+instance Show Tile where
+  show = return . tileToChar
+
+type Coord = Sum (Int,Int)
+
+data BeamTip = BeamTip Direction Coord
+
+type MirrorMchn = A.Array Coord Tile
+
+-- * Parsing
+
+tileToChar :: Tile -> Char
+tileToChar Empty = '.'
+tileToChar VSplit = '|'
+tileToChar HSplit = '-'
+tileToChar UMirror = '/'
+tileToChar DMirror = '\\'
+
+charToTile :: Char -> Tile
+charToTile '.' = Empty 
+charToTile '|' = VSplit 
+charToTile '-' = HSplit 
+charToTile '/' = UMirror 
+charToTile '\\' = DMirror 
+charToTile c = error $ "charToTile: unexpected char: " <> [c]
+
+prepareInput :: Input -> MirrorMchn
+prepareInput = undefined
+
+-- * Solution
 
 solutionPart1 :: Input -> String
 solutionPart1 = const ("In Progress" :: String)
