@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
-module Aoc.Solve.X
-  ( solveDayX,
+module Aoc.Solve.Sixteen
+  ( solveDay16,
     -- dbg
     Input,
     solutionPart1,
@@ -17,8 +17,8 @@ solutionPart1 = const ("In Progress" :: String)
 solutionPart2 :: Input -> String
 solutionPart2 = const ("In Progress" :: String) 
 
-solveDayX :: FilePath -> IO ()
-solveDayX input'path = do
+solveDay16 :: FilePath -> IO ()
+solveDay16 input'path = do
   input'string <- readFile input'path
 
   let input'lines = lines input'string

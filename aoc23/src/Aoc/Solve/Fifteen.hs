@@ -15,23 +15,13 @@ type Input = String
 
 type FocalLen = Int
 
-data HMInst = RemoveLens | PlaceLens FocalLen deriving (Eq)
-
-instance Show HMInst where
-  show RemoveLens = "<rm>"
-  show (PlaceLens fl) = "<pl:" <> show fl <> ">"
+data HMInst = RemoveLens | PlaceLens FocalLen deriving (Eq, Show)
 
 type HMLabel = String
 
-data HMStep = HMStep HMLabel HMInst deriving (Eq)
-
-instance Show HMStep where
-  show (HMStep l i) = "{" <> l <> ":" <> show i <> "}"
+data HMStep = HMStep HMLabel HMInst deriving (Eq, Show)
 
 data Lens = Lens HMLabel FocalLen
-
-instance Show Lens where
-  show (Lens lab fl) = "("<>lab<>" "<>show fl<>")"
 
 type LensBoxes = IM.IntMap [Lens]
 
