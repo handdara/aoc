@@ -1,47 +1,110 @@
 module Aoc.Solve.Fifteen
   ( solveDay15,
-  -- dbg
   )
 where
 
 import Aoc.Parse
-import Data.Char (ord)
+import Data.Char (isSpace, ord)
+import qualified Data.IntMap.Strict as IM
+import Data.IntMap.Strict ((!))
+import Data.Maybe (fromJust)
 
 -- * Types
 
 type Input = String
 
+type FocalLen = Int
+
+data HMInst = RemoveLens | PlaceLens FocalLen deriving (Eq)
+
+instance Show HMInst where
+  show RemoveLens = "<rm>"
+  show (PlaceLens fl) = "<pl:" <> show fl <> ">"
+
+type HMLabel = String
+
+data HMStep = HMStep HMLabel HMInst deriving (Eq)
+
+instance Show HMStep where
+  show (HMStep l i) = "{" <> l <> ":" <> show i <> "}"
+
+data Lens = Lens HMLabel FocalLen
+
+instance Show Lens where
+  show (Lens lab fl) = "("<>lab<>" "<>show fl<>")"
+
+type LensBoxes = IM.IntMap [Lens]
+
 -- * Parsing
 
 hashStringP :: Parser [String]
-hashStringP = mkSepByParser (mkCharParser ',') (mkSpanParser (/=','))
+hashStringP = mkSepByParser (mkCharParser ',') (mkSpanParser (/= ','))
 
-prepareInput :: [Char] -> Maybe [String]
-prepareInput = return . snd <=< runParser hashStringP . filter (/= '\n')
+hmLabelP :: Parser HMLabel
+hmLabelP = mkSpanParser (`notElem` ("-=" :: [Char]))
+
+hmInstP :: Parser HMInst
+hmInstP = rmP <|> plP
+  where
+    plP = PlaceLens <$> (mkCharParser '=' *> intParser)
+    rmP = mkCharParser '-' $> RemoveLens
+
+hmStepP :: Parser HMStep
+hmStepP = HMStep <$> hmLabelP <*> hmInstP
+
+hmStepsP :: Parser [HMStep]
+hmStepsP = mkSepByParser (mkCharParser ',') hmStepP
+
+hashPrepare :: Input -> [String]
+hashPrepare = snd . fromJust . runParser hashStringP . filter (/= '\n')
+
+hashmapPrepare :: Input -> [HMStep]
+hashmapPrepare = snd . fromJust . runParser hmStepsP . filter (not . isSpace)
 
 -- * Solution
 
-updateHash :: Int -> Char -> Int
-updateHash v c =
-  let v'  = v + ord c
-      v'' = v' * 17
-   in v'' `mod` 256
+applyHASH :: String -> Int
+applyHASH = foldl processChar 0
+  where
+    processChar v c = ((v + ord c) * 17) `mod` 256
 
-hash :: String -> Int 
-hash = foldl updateHash 0
+solutionPart1 :: [Char] -> Int
+solutionPart1 = sum . map applyHASH . hashPrepare
 
-solutionPart1 :: [Char] -> Maybe Int
-solutionPart1 = return . sum . map hash <=< prepareInput
+updateBox :: HMInst -> HMLabel -> [Lens] -> [Lens]
+updateBox RemoveLens label lenses =
+  case break (\(Lens label'box _) -> label'box == label) lenses of
+    (before, _:after) -> before <> after
+    (lens'all, []) -> lens'all
+updateBox (PlaceLens fl) label lenses =
+  case break (\(Lens label'box _) -> label'box == label) lenses of
+    (before, _:after) -> before <> (Lens label fl : after)
+    (lens'all, []) -> lens'all <> [Lens label fl]
 
-solutionPart2 :: Input -> String
-solutionPart2 = const ("In Progress" :: String)
+processHMStep :: LensBoxes -> HMStep -> LensBoxes
+processHMStep lbM (HMStep label inst) =
+  let boxIdx = applyHASH label
+      lenses = lbM ! boxIdx
+      lenses'new = updateBox inst label lenses
+  in IM.insert boxIdx lenses'new lbM
+
+initLensBoxes :: LensBoxes
+initLensBoxes = foldr (`IM.insert` []) IM.empty [0..255]
+
+doHASHMAP :: [HMStep] -> LensBoxes
+doHASHMAP = foldl processHMStep initLensBoxes
+
+boxToFocusPwr :: (Int, [Lens]) -> Int
+boxToFocusPwr (boxIdx, lenses) = (boxIdx + 1) * sum lensProds
+  where
+    lensProds = zipWith (\(Lens _ fl) lensNum -> lensNum*fl) lenses ([1..]::[Int])
+
+solutionPart2 :: Input -> Int
+solutionPart2 = sum . map boxToFocusPwr . IM.toList . doHASHMAP . hashmapPrepare
 
 solveDay15 :: FilePath -> IO ()
 solveDay15 input'path = do
   input'string <- readFile input'path
-
-  -- putStrLn "Input: "
-  -- mapM_ putStrLn input'lines
 
   putStrLn $ "Solution to part 1: " <> show (solutionPart1 input'string)
 
