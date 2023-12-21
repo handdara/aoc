@@ -15,6 +15,7 @@ module Aoc.Parse
     some,
     many,
     optional,
+    genericStringParser,
   )
 where
 
@@ -99,6 +100,9 @@ genericCharParser = Parser f
   where
     f [] = Nothing
     f (x : xs) = Just (xs, x)
+
+genericStringParser :: Parser String
+genericStringParser = many genericCharParser
 
 lineEmpty :: String -> Bool
 lineEmpty = all isSpace

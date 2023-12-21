@@ -1,6 +1,6 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Fourteen,
+    module Aoc.Solve.Fifteen,
     testing,
     solveDay1,
     solveDay2,
@@ -15,21 +15,23 @@ module Aoc
     solveDay11,
     solveDay12,
     solveDay13,
+    solveDay14,
   )
 where
 
 import Aoc.App
 import Aoc.Solve.Eight
 import Aoc.Solve.Eleven
+import Aoc.Solve.Fifteen
 import Aoc.Solve.Five
 import Aoc.Solve.Four
+import Aoc.Solve.Fourteen
 import Aoc.Solve.Nine
 import Aoc.Solve.One
 import Aoc.Solve.Seven
 import Aoc.Solve.Six
 import Aoc.Solve.Ten
 import Aoc.Solve.Thirteen
-import Aoc.Solve.Fourteen
 import Aoc.Solve.Three
 import Aoc.Solve.Twelve
 import Aoc.Solve.Two
