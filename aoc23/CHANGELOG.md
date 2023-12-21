@@ -1,6 +1,6 @@
 # Revision history for aoc23
 
-## 0.1.14.0 -- 2023-12-xx
+## 0.1.14.0 -- 2023-12-20
 
 * Day 14 Solution
 
