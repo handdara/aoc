@@ -9,23 +9,34 @@ module Aoc.Solve.Sixteen
   )
 where
 
-import Data.Monoid (Sum)
 import qualified Data.Array.IArray as A
+import Data.Monoid (Sum)
 
 -- * Types
 
 type Input = [String]
 
-data Direction = East | North | West | South 
-  deriving (Eq, Ord)
-
-data Tile = Empty | VSplit | HSplit | UMirror | DMirror 
+data Tile = Empty | VSplit | HSplit | UMirror | DMirror
   deriving (Eq, Ord)
 
 instance Show Tile where
   show = return . tileToChar
 
-type Coord = Sum (Int,Int)
+type Coord = (Sum Int, Sum Int)
+
+type Direction = Coord
+
+east :: Direction
+east = (0, 1)
+
+north :: Direction
+north = (1, 0)
+
+west :: Direction
+west = (0, -1)
+
+south :: Direction
+south = (-1, 0)
 
 data BeamTip = BeamTip Direction Coord
 
@@ -41,11 +52,11 @@ tileToChar UMirror = '/'
 tileToChar DMirror = '\\'
 
 charToTile :: Char -> Tile
-charToTile '.' = Empty 
-charToTile '|' = VSplit 
-charToTile '-' = HSplit 
-charToTile '/' = UMirror 
-charToTile '\\' = DMirror 
+charToTile '.' = Empty
+charToTile '|' = VSplit
+charToTile '-' = HSplit
+charToTile '/' = UMirror
+charToTile '\\' = DMirror
 charToTile c = error $ "charToTile: unexpected char: " <> [c]
 
 prepareInput :: Input -> MirrorMchn
@@ -53,11 +64,26 @@ prepareInput = undefined
 
 -- * Solution
 
+updateBeamTip :: Tile -> BeamTip -> [BeamTip]
+updateBeamTip VSplit (BeamTip d c) | d == east || d == west = [BeamTip north (c <> north), BeamTip south (c<>south)]
+updateBeamTip HSplit (BeamTip d c) | d == north || d == south = [BeamTip east (c <> east), BeamTip west (c<>west)]
+updateBeamTip UMirror (BeamTip d c) 
+  | d == east = [BeamTip north (c <> north)]
+  | d == north = [BeamTip east (c <> east)]
+  | d == west = [BeamTip south (c <> south)]
+  | d == south = [BeamTip west (c <> west)]
+updateBeamTip DMirror (BeamTip d c) 
+  | d == east = [BeamTip south (c <> south)]
+  | d == north = [BeamTip west (c <> west)]
+  | d == west = [BeamTip north (c <> north)]
+  | d == south = [BeamTip east (c <> east)]
+updateBeamTip _ (BeamTip d c) = [BeamTip d (c <> d)]
+
 solutionPart1 :: Input -> String
 solutionPart1 = const ("In Progress" :: String)
 
 solutionPart2 :: Input -> String
-solutionPart2 = const ("In Progress" :: String) 
+solutionPart2 = const ("In Progress" :: String)
 
 solveDay16 :: FilePath -> IO ()
 solveDay16 input'path = do
