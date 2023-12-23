@@ -34,6 +34,7 @@ commandParser =
     <|> subcommand "fourteen" "solve day 14 of advent of code" (A.Day14 <$> extraParser <*> optional inputParser)
     <|> subcommand "fifteen" "solve day 15 of advent of code" (A.Day15 <$> optional inputParser)
     <|> subcommand "sixteen" "solve day 16 of advent of code" (A.Day16 <$> optional inputParser)
+    <|> subcommand "seventeen" "solve day 17 of advent of code" (A.Day17 <$> optional inputParser)
     <|> subcommand "testing" "dummy testing command" (A.Testing <$> extraParser)
 
 optsParser :: Parser A.Opts
@@ -93,6 +94,8 @@ aoc command _ = do
     A.Day15 (Just fp) -> liftIO $ A.solveDay15 fp
     A.Day16 Nothing -> liftIO $ A.solveDay16 "input16.txt"
     A.Day16 (Just fp) -> liftIO $ A.solveDay16 fp
+    A.Day17 Nothing -> liftIO $ A.solveDay17 "input17.txt"
+    A.Day17 (Just fp) -> liftIO $ A.solveDay17 fp
     _ -> echo "This day hasn't been started yet!"
 
 main :: IO ()
