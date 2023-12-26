@@ -32,7 +32,7 @@ data Command
   | Day15 (Maybe FilePath)
   | Day16 (Maybe FilePath)
   | Day17 (Maybe FilePath)
-  | Day18 [Text] (Maybe FilePath) (Maybe FilePath)
+  | Day18 (Maybe FilePath)
   | Day19 [Text] (Maybe FilePath) (Maybe FilePath)
   | Day20 [Text] (Maybe FilePath) (Maybe FilePath)
   | Day21 [Text] (Maybe FilePath) (Maybe FilePath)

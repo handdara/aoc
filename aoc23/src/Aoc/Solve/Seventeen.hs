@@ -1,17 +1,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
+
 module Aoc.Solve.Seventeen
   ( solveDay17,
-    -- dbg
-    Input,
-    Coord (..),
-    Direction (..),
-    CityMap,
-    DirCount (..),
-    unitCoord,
-    getAdj,
-    getAdjUltra,
-    solutionPart1,
-    solutionPart2,
   )
 where
 
@@ -159,7 +149,7 @@ solveDay17 input'path = do
         ((,) <$> solutionPart1 <*> solutionPart2) input'lines
           `using` parTuple2 rseq rseq
 
-  putStr "Solution to part 1: " 
+  putStr "Solution to part 1: "
   print s1
 
   putStr "Solution to part 2: "

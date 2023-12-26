@@ -1,6 +1,6 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Seventeen,
+    module Aoc.Solve.Eighteen,
     testing,
     solveDay1,
     solveDay2,
@@ -18,6 +18,7 @@ module Aoc
     solveDay14,
     solveDay15,
     solveDay16,
+    solveDay17,
   )
 where
 
@@ -39,5 +40,6 @@ import Aoc.Solve.Thirteen
 import Aoc.Solve.Three
 import Aoc.Solve.Twelve
 import Aoc.Solve.Two
+import Aoc.Solve.Eighteen
 import Aoc.Testing
 import Prelude hiding (FilePath, log)
