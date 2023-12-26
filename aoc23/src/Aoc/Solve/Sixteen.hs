@@ -2,20 +2,6 @@
 
 module Aoc.Solve.Sixteen
   ( solveDay16,
-    -- dbg
-    Input,
-    BeamFront (..),
-    Direction,
-    Coord,
-    Tile (..),
-    MirrorMchn,
-    north,
-    south,
-    east,
-    west,
-    updateBeamFront,
-    solutionPart1,
-    solutionPart2,
   )
 where
 
