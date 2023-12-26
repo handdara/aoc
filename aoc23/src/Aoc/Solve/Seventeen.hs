@@ -1,37 +1,33 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
-
 module Aoc.Solve.Seventeen
   ( solveDay17,
     -- dbg
     Input,
     Coord (..),
-    Direction,
+    Direction (..),
     CityMap,
     DirCount (..),
     unitCoord,
     getAdj,
+    getAdjUltra,
     solutionPart1,
     solutionPart2,
   )
 where
 
-import Control.DeepSeq
 import Control.Parallel.Strategies
 import Data.Array.IArray ((!))
 import qualified Data.Array.IArray as A
 import Data.Function (on)
 import qualified Data.List as L
 import qualified Data.Set as S
-import Debug.Trace (trace)
-import GHC.Generics (Generic)
+import Data.Time.Clock (diffUTCTime, getCurrentTime)
 
 -- * Types
 
 type Input = [String]
 
-newtype Coord = Coord (Int, Int) deriving (Show, Eq, Ord, A.Ix, Generic, NFData)
+newtype Coord = Coord (Int, Int) deriving (Show, Eq, Ord, A.Ix)
 
 instance Semigroup Coord where
   Coord (xl, yl) <> Coord (xr, yr) = Coord (xl + xr, yl + yr)
@@ -39,7 +35,7 @@ instance Semigroup Coord where
 instance Monoid Coord where
   mempty = Coord (0, 0)
 
-data Direction = East | North | West | South deriving (Show, Eq, Ord, Enum, Bounded, Generic, NFData)
+data Direction = East | North | West | South deriving (Show, Eq, Ord, Enum, Bounded)
 
 unitCoord :: Direction -> Coord
 unitCoord East = Coord (0, 1)
@@ -51,18 +47,21 @@ type HeatLoss = Int
 
 type CityMap = A.Array Coord HeatLoss
 
-data DirCount = Zero | One | Two | Three | Four deriving (Show, Eq, Ord, Enum, Generic, NFData)
+data DirCount = Zero | One | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten | Eleven
+  deriving (Show, Eq, Ord, Enum)
 
 data CruciblePos = CP
   { getCoord :: Coord,
     _dir :: Direction,
-    _dirCnt :: DirCount
+    getDirCnt :: DirCount
   }
-  deriving (Eq, Ord, Generic, NFData)
+  deriving (Eq, Ord)
 
 instance Show CruciblePos where
   show (CP (Coord c) d dc) =
     "{" <> show c <> ", " <> take 1 (show d) <> " for " <> show dc <> "}"
+
+type SearchState = ([(CruciblePos, HeatLoss)], S.Set CruciblePos)
 
 -- * Parsing
 
@@ -77,72 +76,77 @@ prepareInput i@(l : ls)
 
 -- * Solutions
 
-allDirs :: [Direction]
-allDirs = [minBound .. maxBound]
+changeDir :: Int -> Direction -> Direction
+changeDir i d = toEnum $ mod (fromEnum d + i) (1 + fromEnum (maxBound :: Direction))
 
 getAdj :: CityMap -> S.Set CruciblePos -> (CruciblePos, HeatLoss) -> [(CruciblePos, HeatLoss)]
 getAdj m visited (CP c d cnt, h) = do
-  d'new <- allDirs
+  d'new <- [changeDir (-1) d, d, changeDir 1 d]
   let c'new = c <> unitCoord d'new
   let cnt'new = if d == d'new then succ cnt else One
   let cp'new = CP c'new d'new cnt'new
-  ( [ (cp'new, h + heatLossAt c'new)
-      | inBounds c'new
-          && cnt'new /= Four
-          && cp'new `S.notMember` visited
+  [ (cp'new, h + heatLossAt c'new)
+    | inBounds c'new
+        && cnt'new < Four
+        && cp'new `S.notMember` visited
     ]
-    )
   where
     inBounds = A.inRange (A.bounds m)
     heatLossAt = (!) m
 
-visitedCoord :: Coord -> S.Set CruciblePos -> Bool
-visitedCoord c = S.member c . S.map getCoord
+atCoord :: Coord -> SearchState -> Bool
+atCoord c = (c `elem`) . map (getCoord . fst) . fst
 
-type SearchState = ([(CruciblePos, HeatLoss)], S.Set CruciblePos)
-
-stepSearch :: CityMap -> SearchState -> SearchState
-stepSearch m (fs, vs) = (fs'new, vs'new)
+stepLowest _ _ ([], _) = error "stepLowest: empty front list"
+stepLowest adjFunc m (fs@(f : fs'tail), vs) = (fs'new, vs'new)
   where
-    fs'new = (`using` parList rseq) $ do
-      f <- fs
-      let adj = getAdj m vs f
-      if null adj then [f] else adj
+    f'news = adjFunc m vs f
+    fs'new = L.sortBy (compare `on` snd) $ f'news <> fs'tail
     vs'new = S.union vs . S.fromList . map fst $ fs
 
-bfs m = until p (stepSearch m)
-  where
-    p :: SearchState -> Bool
-    p (fs, vs) = all ((`S.member` vs) . fst) fs
+dfs :: CityMap -> Coord -> SearchState -> SearchState
+dfs m c = until (atCoord c) (stepLowest getAdj m)
 
-stepLowest :: CityMap -> SearchState -> SearchState
-stepLowest _ ([], _) = error "stepLowest: empty front list"
-stepLowest m (fs@(f : fs'tail), vs) = (fs'new, vs'new)
-  where
-    f'news = getAdj m vs f
-      `using` parList rseq
-    fs'new = L.sortBy (compare `on` snd) f'news <> fs'tail
-    vs'new = S.union vs . S.fromList . map fst $ fs
-
-tracer msg x = trace (msg <> show x) x
-
-dfs m c = until (visitedCoord c . snd) (stepLowest m)
-
--- solutionPart1 :: Input -> String
--- solutionPart1 i = coordBfs (Coord (1,3)) $ x0
--- solutionPart1 i = bfs m $ x0
--- solutionPart1 i = step.step $ x0
-solutionPart1 i = dfs m (Coord (12,12)) x0
+solutionPart1 :: Input -> HeatLoss
+solutionPart1 i = snd . head . filter ((== tgt) . getCoord . fst) . fst $ dfs m tgt x0
   where
     m = prepareInput i
+    tgt = snd . A.bounds $ m
     cp0 = CP mempty East Zero
-    -- cp0 = CP (Coord (0,3)) East Three
     x0 = ([(cp0, 0)], S.empty)
-    step = stepLowest m
-    coordBfs c = until (visitedCoord c . snd) step
 
-solutionPart2 :: Input -> String
-solutionPart2 = const ("In Progress" :: String)
+getAdjUltra :: CityMap -> S.Set CruciblePos -> (CruciblePos, HeatLoss) -> [(CruciblePos, HeatLoss)]
+getAdjUltra m visited (CP c d cnt, h) = do
+  d'new <- [changeDir (-1) d, d, changeDir 1 d]
+  let c'new = c <> unitCoord d'new
+  let goingStraight = d == d'new
+  let cnt'new = if goingStraight then succ cnt else One
+  let cp'new = CP c'new d'new cnt'new
+  [ (cp'new, h + heatLossAt c'new)
+    | inBounds c'new
+        && cnt'new < Eleven
+        && (cnt == Zero || Four <= cnt || goingStraight)
+        && cp'new `S.notMember` visited
+    ]
+  where
+    inBounds = A.inRange (A.bounds m)
+    heatLossAt = (!) m
+
+atCoordUltra :: Coord -> SearchState -> Bool
+atCoordUltra c = any (isEnd . fst) . fst
+  where
+    isEnd = (&&) <$> (== c) . getCoord <*> ((>= Four) . getDirCnt)
+
+dfsUltra :: CityMap -> Coord -> SearchState -> SearchState
+dfsUltra m c = until (atCoordUltra c) (stepLowest getAdjUltra m)
+
+solutionPart2 :: Input -> HeatLoss
+solutionPart2 i = snd . head . filter ((== tgt) . getCoord . fst) . fst $ dfsUltra m tgt x0
+  where
+    m = prepareInput i
+    tgt = snd . A.bounds $ m
+    cp0 = CP mempty East Zero
+    x0 = ([(cp0, 0)], S.empty)
 
 solveDay17 :: FilePath -> IO ()
 solveDay17 input'path = do
@@ -150,13 +154,16 @@ solveDay17 input'path = do
 
   let input'lines = lines input'string
 
-  putStrLn "Input: "
-  mapM_ putStrLn input'lines
+  t0 <- getCurrentTime
+  let (s1, s2) =
+        ((,) <$> solutionPart1 <*> solutionPart2) input'lines
+          `using` parTuple2 rseq rseq
 
-  let (fs, vs) = solutionPart1 input'lines
-  putStrLn "Solution to part 1, fronts: "
-  mapM_ print fs
-  putStrLn "Solution to part 1, visited: "
-  mapM_ print (S.toList vs)
+  putStr "Solution to part 1: " 
+  print s1
 
-  putStrLn $ "Solution to part 2: " <> show (solutionPart2 input'lines)
+  putStr "Solution to part 2: "
+  print s2
+  t1 <- getCurrentTime
+
+  putStrLn $ "Solution time: " <> show (diffUTCTime t1 t0)
