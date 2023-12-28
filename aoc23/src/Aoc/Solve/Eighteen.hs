@@ -144,44 +144,6 @@ fdArea dp = sum . map (getSum . scanRow) $ [i'min .. i'max]
               acc' = if onHole || inside then acc+1 else acc
            in ScSt acc' above'' below'' inside'
 
-renderInner :: DigPlan -> [[Char]]
-renderInner dp = map (getStr . scanRow) $ [i'min .. i'max]
-  where
-    ks = M.keys dp
-    (i'min, i'max) = (,) <$> minimum <*> maximum $ map fst ks
-    (j'min, j'max) = (,) <$> minimum <*> maximum $ map snd ks
-    scanRow i = foldl' processCell initScanSt [j'min .. j'max]
-      where
-        initScanSt = ScSt' [] False False False
-        processCell :: ScanState' -> Int -> ScanState'
-        processCell (ScSt' acc above below inside) j =
-          let onHole = (i, j) `M.member` dp
-              holeIsAbove = (i - 1, j) `M.member` dp
-              holeIsBelow = (i + 1, j) `M.member` dp
-              above' = ((onHole && holeIsAbove) || above)
-              below' = ((onHole && holeIsBelow) || below)
-              c = case (onHole, inside) of
-                (True, True) -> '#'
-                (False, True) -> '@'
-                (False, False) -> '.'
-                (True, False) -> 'O'
-              inside' = (onHole && above' && below') `xor` inside
-              (above'', below'') = if inside /= inside' || not onHole
-                then (False, False)
-                else (above', below')
-           in ScSt' (acc<>[c]) above'' below'' inside'
-
-renderDigPlan :: DigPlan -> [String]
-renderDigPlan dp = map renderRow [i'min .. i'max]
-  where
-    ks = M.keys dp
-    (i'min, i'max) = (,) <$> minimum <*> maximum $ map fst ks
-    (j'min, j'max) = (,) <$> minimum <*> maximum $ map snd ks
-    boolToChar b = if b then '#' else '.'
-    renderRow i = map (boolToChar . (`M.member` dp) . (i,)) [j'min .. j'max]
-
-tracer msg x = trace (msg <> show x) x
-
 -- solutionPart1 :: Input -> DigPlan
 solutionPart1 = fdArea . mkDigPlan . prepareInput
 
@@ -194,17 +156,10 @@ solveDay18 input'path = do
 
   let input'lines = takeWhile (not . lineEmpty) . lines $ input'string
 
-  putStrLn "Input: "
-  mapM_ putStrLn input'lines
+  -- putStrLn "Input: "
+  -- mapM_ putStrLn input'lines
 
   let s1 = solutionPart1 input'lines
   putStrLn $ "Solution to part 1: " <> show s1
-
-  let rendered = renderInner . mkDigPlan . prepareInput $ input'lines
-  -- let s1' = length . filter (/='.') . mconcat $ rendered
-  -- putStrLn $ "Solution to part 1, second: " <> show s1'
-  -- mapM_ putStrLn rendered
-  -- print rendered
-  -- output "tmp18.txt" (select $ map (unsafeTextToLine . pack) rendered)
 
   putStrLn $ "Solution to part 2: " <> show (solutionPart2 input'lines)
