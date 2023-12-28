@@ -16,16 +16,12 @@ where
 
 import Aoc.Parse
 import Control.Applicative
+import Data.Bits (xor)
 import Data.List (foldl')
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromMaybe)
-import Data.Text (pack)
 import Debug.Trace (trace)
 import GHC.Generics (Generic1, Generically1 (..))
-import Turtle (output, unsafeTextToLine)
-import Turtle.Line (textToLine)
-import Turtle.Shell (select)
-import Data.Bits (xor)
 
 -- * Types
 
@@ -35,7 +31,7 @@ data Direction = East | North | West | South deriving (Show, Eq, Ord, Enum, Boun
 
 type Meter = Int
 
-type Color = (Int, Int, Int)
+type Color = String
 
 data Instruction = Inst
   { _dir :: Direction,
@@ -61,6 +57,8 @@ type Hole = Tile Color
 
 type DigPlan = M.Map Coord Hole
 
+data ScanState = ScSt {getSum :: Int, _above, _below, _inside :: Bool} deriving (Show)
+
 -- * Parsing
 
 dirP :: Parser Direction
@@ -75,16 +73,7 @@ meterP :: Parser Meter
 meterP = intParser
 
 colorP :: Parser Color
-colorP =
-  mkStringParser "(#"
-    *> ( (,,)
-           <$> (hexToInt <$> mkTakeParser 2)
-           <*> (hexToInt <$> mkTakeParser 2)
-           <*> (hexToInt <$> mkTakeParser 2)
-       )
-    <* mkCharParser ')'
-  where
-    hexToInt = read . ("0x" ++)
+colorP = mkStringParser "(#" *> mkTakeParser 6 <* mkCharParser ')'
 
 instP :: Parser Instruction
 instP =
@@ -100,7 +89,6 @@ prepareInput = map (fromMaybe (error "parse failed") . tryParse instP)
 processInst :: (Coord, DigPlan) -> Instruction -> (Coord, DigPlan)
 processInst ((i, j), dpM) (Inst d l col) =
   (,)
-    -- (tracer "last coord: " $ last cs)
     (last cs)
     (foldl' (\acc c -> M.insertWith (<|>) c hole acc) dpM cs)
   where
@@ -117,9 +105,6 @@ processInst ((i, j), dpM) (Inst d l col) =
 
 mkDigPlan :: [Instruction] -> DigPlan
 mkDigPlan = snd . foldl' processInst ((0, 0), M.singleton (0, 0) empty)
-
-data ScanState = ScSt {getSum :: Int, _above, _below, _inside :: Bool} deriving (Show)
-data ScanState' = ScSt' {getStr :: [Char], _above', _below', _inside' :: Bool} deriving (Show)
 
 fdArea :: DigPlan -> Int
 fdArea dp = sum . map (getSum . scanRow) $ [i'min .. i'max]
@@ -138,13 +123,14 @@ fdArea dp = sum . map (getSum . scanRow) $ [i'min .. i'max]
               above' = ((onHole && holeIsAbove) || above)
               below' = ((onHole && holeIsBelow) || below)
               inside' = (onHole && above' && below') `xor` inside
-              (above'', below'') = if inside /= inside' || not onHole
-                then (False, False)
-                else (above', below')
-              acc' = if onHole || inside then acc+1 else acc
+              (above'', below'') =
+                if inside /= inside' || not onHole
+                  then (False, False)
+                  else (above', below')
+              acc' = if onHole || inside then acc + 1 else acc
            in ScSt acc' above'' below'' inside'
 
--- solutionPart1 :: Input -> DigPlan
+solutionPart1 :: Input -> Int
 solutionPart1 = fdArea . mkDigPlan . prepareInput
 
 solutionPart2 :: Input -> String

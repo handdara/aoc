@@ -91,10 +91,10 @@ mkTakeParser :: Int -> Parser String
 mkTakeParser n = Parser f
   where
     f s =
-      let (is, s') = splitAt n s
-       in case is of
-            [_, _] -> Just (s', is)
-            _ -> Nothing
+      let (s'l, s'r) = splitAt n s
+       in if length s'l == n
+            then Just (s'r, s'l)
+            else Nothing
 
 mkSepByParser :: Parser a -> Parser b -> Parser [b]
 mkSepByParser s e =
