@@ -1,5 +1,6 @@
 module Aoc.Parse
   ( Parser (..),
+    tryParse,
     mkCharParser,
     mkStringParser,
     mkSpanParser,
@@ -16,6 +17,7 @@ module Aoc.Parse
     many,
     optional,
     genericStringParser,
+    mkTakeParser,
   )
 where
 
@@ -27,6 +29,9 @@ import Data.Functor (($>))
 newtype Parser a = Parser
   { runParser :: String -> Maybe (String, a)
   }
+
+tryParse :: Parser a -> String -> Maybe a
+tryParse p = return . snd <=< runParser p
 
 -- * Parser type Alternative implementation
 
@@ -81,6 +86,15 @@ ensureNonempty (Parser p) = Parser f
       if null xs
         then Nothing
         else Just (s', xs)
+
+mkTakeParser :: Int -> Parser String
+mkTakeParser n = Parser f
+  where
+    f s =
+      let (is, s') = splitAt n s
+       in case is of
+            [_, _] -> Just (s', is)
+            _ -> Nothing
 
 mkSepByParser :: Parser a -> Parser b -> Parser [b]
 mkSepByParser s e =
