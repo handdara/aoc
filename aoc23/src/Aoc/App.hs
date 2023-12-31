@@ -45,7 +45,8 @@ data Command
 
 -- | Type encompassing the command line flags
 data Opts = Opts
-  { verbosity :: Bool
+  { verbosity :: Bool,
+    threadCap :: Maybe Int
   }
 
 -- * Logging

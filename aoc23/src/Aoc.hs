@@ -1,6 +1,5 @@
 module Aoc
   ( module Aoc.App,
-    module Aoc.Solve.Eighteen,
     testing,
     solveDay1,
     solveDay2,
@@ -19,6 +18,7 @@ module Aoc
     solveDay15,
     solveDay16,
     solveDay17,
+    solveDay18,
   )
 where
 
