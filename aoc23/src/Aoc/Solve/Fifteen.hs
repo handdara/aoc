@@ -4,7 +4,7 @@ module Aoc.Solve.Fifteen
 where
 
 import Aoc.Parse
-import Data.Char (isSpace, ord)
+import Data.Char (ord)
 import qualified Data.IntMap.Strict as IM
 import Data.IntMap.Strict ((!))
 import Data.Maybe (fromJust)
