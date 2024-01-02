@@ -1,6 +1,10 @@
 # Revision history for aoc23
 
-## 0.1.19.0 -- 2024-01-XX
+## 0.1.20.0 -- 2024-01-XX
+
+* Day 20 Solution
+
+## 0.1.19.0 -- 2024-01-02
 
 * Day 19 Solution
 
