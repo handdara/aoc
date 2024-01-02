@@ -18,12 +18,15 @@ module Aoc.Parse
     optional,
     genericStringParser,
     mkTakeParser,
+    isAlpha,
+    isDigit,
+    isSpace,
   )
 where
 
 import Control.Applicative
 import Control.Monad ((<=<))
-import Data.Char (isDigit, isSpace)
+import Data.Char (isAlpha, isDigit, isSpace)
 import Data.Functor (($>))
 
 newtype Parser a = Parser
