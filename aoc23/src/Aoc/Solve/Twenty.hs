@@ -9,13 +9,28 @@ module Aoc.Solve.Twenty
   )
 where
 
+import Aoc.Parse
+import qualified Data.Map.Strict as M
+
+-- * Types
+
 type Input = [String]
+
+type ModuleLabel = String
+
+type RxMemory = M.Map ModuleLabel Bool
+
+data ModuleState = FlipFlop Bool | Conjuction RxMemory | Broadcast
+
+-- * Parsing
+
+-- * Solutions
 
 solutionPart1 :: Input -> String
 solutionPart1 = const ("In Progress" :: String)
 
 solutionPart2 :: Input -> String
-solutionPart2 = const ("In Progress" :: String) 
+solutionPart2 = const ("In Progress" :: String)
 
 solveDay20 :: FilePath -> IO ()
 solveDay20 input'path = do
