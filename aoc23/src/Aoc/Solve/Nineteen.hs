@@ -27,23 +27,23 @@ data Condition = Condition {_rating :: Rating, _compType :: Ordering, _compval :
 
 data Rule = Rule {_cond :: Condition, _dest :: WLabel}
 
-instance Show Rule where show (Rule _ d) = "R-" ++ d
-
 type Workflow = (WLabel, [Rule])
 
 data Part a = Part {getX, getM, getA, getS :: a} deriving (Functor, Foldable)
-
-instance (Show a) => Show (Part a) where show p = "{" ++ (L.intercalate "," . toList $ show <$> p) ++ "}"
 
 type SinglePart = Part Int
 
 type Workflows = M.Map WLabel [Rule]
 
+instance Show Rule where 
+  show (Rule _ d) = "R-" ++ d
+
+instance (Show a) => Show (Part a) where 
+  show p = "{" ++ (L.intercalate "," . toList $ show <$> p) ++ "}"
+
 -- ** Part 2 Types
 
 data Range a = MkRg {_lo, _hi :: a} deriving (Eq, Ord, Functor, Foldable)
-
-instance (Show a) => Show (Range a) where show (MkRg lo hi) = "[" ++ show lo ++ ".." ++ show hi ++ "]"
 
 type RatingRange = Range Int
 
@@ -52,6 +52,9 @@ type PartSet = Part RatingRange
 data PSState = St {getStateLabel :: WLabel, getStatePartSet :: PartSet}
 
 data Split a = Together a | Split a a deriving (Show, Foldable)
+
+instance (Show a) => Show (Range a) where 
+  show (MkRg lo hi) = "[" ++ show lo ++ ".." ++ show hi ++ "]"
 
 -- * Parsing
 
