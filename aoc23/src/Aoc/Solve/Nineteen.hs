@@ -51,7 +51,7 @@ type PartSet = Part RatingRange
 
 data PSState = St {getStateLabel :: WLabel, getStatePartSet :: PartSet}
 
-data Split a = Together a | Split a a deriving (Show, Foldable) 
+data Split a = Together a | Split a a deriving (Show, Foldable)
 
 -- * Parsing
 
@@ -89,7 +89,7 @@ singlePartP =
 
 workflowsPartsP :: Parser (Workflows, [SinglePart])
 workflowsPartsP = (,) <$> workflowsP <*> partsP
-    where
+  where
     newlineP = mkCharParser '\n' $> ()
     workflowsP = M.fromList <$> mkSepByParser newlineP workflowP
     partsP = whiteParser *> mkSepByParser newlineP singlePartP
