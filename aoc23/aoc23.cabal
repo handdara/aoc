@@ -1,25 +1,28 @@
 cabal-version:      3.8
 name:               aoc23
-version:            0.1.0.0
--- synopsis:
--- description:
+version:            0.1.20.0
+synopsis:           Advent of Code 2023 solutions
 license:            GPL-3.0-or-later
 license-file:       LICENSE
 author:             handdara
 maintainer:         handdara.core@gmail.com
--- copyright:
 build-type:         Simple
 extra-doc-files:    CHANGELOG.md
--- extra-source-files:
 
 common shared-props
     default-language: Haskell2010
     build-depends:  
         base ^>=4.17.2.0, 
+        time,
         turtle,
         text,
         bytestring,
-        file-embed
+        containers,
+        unordered-containers,
+        hashtables,
+        deepseq,
+        parallel,
+        array,
     default-extensions: OverloadedStrings
 
 common warnings
@@ -31,9 +34,28 @@ library
     exposed-modules:  Aoc
     other-modules:
         Aoc.App, 
+        Aoc.Testing, 
         Aoc.Solve.One,
         Aoc.Solve.Two,
         Aoc.Solve.Three,
+        Aoc.Solve.Four,
+        Aoc.Solve.Five,
+        Aoc.Solve.Six,
+        Aoc.Solve.Seven,
+        Aoc.Solve.Eight,
+        Aoc.Solve.Nine,
+        Aoc.Solve.Ten,
+        Aoc.Solve.Eleven,
+        Aoc.Solve.Twelve,
+        Aoc.Solve.Thirteen,
+        Aoc.Solve.Fourteen,
+        Aoc.Solve.Fifteen,
+        Aoc.Solve.Sixteen,
+        Aoc.Solve.Seventeen,
+        Aoc.Solve.Eighteen,
+        Aoc.Solve.Nineteen,
+        Aoc.Solve.Twenty,
+        Aoc.Parse, 
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0
     hs-source-dirs:   src
@@ -43,11 +65,11 @@ executable aoc23
     import:           warnings
     import:           shared-props
     main-is:          Main.hs
-    -- other-modules:
-    -- other-extensions:
     build-depends:
         base ^>=4.17.2.0,
         aoc23
+
+    ghc-options: -threaded -rtsopts
 
     hs-source-dirs:   app
     default-language: Haskell2010
