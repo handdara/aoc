@@ -1,0 +1,56 @@
+cabal-version:      3.8
+name:               aoc22
+version:            0.1.6.0
+-- synopsis:
+-- description:
+license:            GPL-3.0-or-later
+license-file:       LICENSE
+author:             handdara
+maintainer:         handdara.core@gmail.com
+-- copyright:
+build-type:         Simple
+extra-doc-files:    CHANGELOG.md
+-- extra-source-files:
+
+common shared-props
+    default-language: Haskell2010
+    build-depends:  
+        base ^>=4.17.2.0, 
+        turtle,
+        text,
+        bytestring,
+        containers,
+    default-extensions: OverloadedStrings
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    import:           shared-props
+    exposed-modules:  Aoc
+    other-modules:
+        Aoc.App, 
+        Aoc.Solve.One,
+        Aoc.Solve.Two,
+        Aoc.Solve.Three,
+        Aoc.Solve.Four,
+        Aoc.Solve.Five,
+        Aoc.Solve.Six,
+    -- other-extensions:
+    build-depends:    base ^>=4.17.2.0
+    hs-source-dirs:   src
+    default-language: Haskell2010
+
+executable aoc22
+    import:           warnings
+    import:           shared-props
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.17.2.0,
+        aoc22
+
+    hs-source-dirs:   app
+    default-language: Haskell2010
