@@ -1,9 +1,0 @@
-# Zig
-zig-*
-.zig-*
-
-# Nix
-result*
-
-# Misc
-.direnv
