@@ -1,0 +1,12 @@
+alias e := edit
+
+default: test run
+
+test:
+    nix develop --command bash -c "zig build test"
+
+run:
+    nix develop --command bash -c "zig build run"
+
+edit:
+    nix develop --command bash -c "nvim"
