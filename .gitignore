@@ -23,3 +23,5 @@ cabal.project.local~
 .ghc.environment.*
 
 **/data
+
+Session.vim
